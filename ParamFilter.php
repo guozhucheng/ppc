@@ -1,16 +1,118 @@
 <?php
 
+use cache\DataCacheFactory;
+use cache\IDataCache;
+use paramCheckResult\ParamCheckException;
+
 require_once('TestClass.php');
+require_once('ParamDocInfo.php');
+
 
 /**
  * 参数过滤器
  * Created by guozhucheng@baidu.com
  * DateTime: 14-8-31 上午1:50
  */
-class ParamFilter {
+class  ParamFilter {
+    const   CACHE_BASE_NAME = 'PARAMFILLTER_CACHE';
+    const   DEFAULT_CACHE   = 'SimpleCache';
+    const   CACHE_DURATION  = 300; //默认缓存5分钟
+    private static $_cache;
+
+    /**
+     * 获取缓存对象
+     * @return IDataCache
+     */
+    private static function  getCache() {
+        if (self::$_cache == null) {
+            $config       = array('name' => self::CACHE_BASE_NAME);
+            self::$_cache = DataCacheFactory::createCache(self::DEFAULT_CACHE, $config);
+        }
+
+        return self::$_cache;
+    }
+
+    /**
+     * 根据分割后的函数注释获取ParamDocInfo对象数组
+     * @param array $docs
+     * @return array
+     */
+    private static function docsToParamDocInfos(array $docs) {
+        $parmDocInfos = array();
+        foreach ($docs as $doc) {
+            array_push($parmDocInfos, new ParamDocInfo($doc));
+        }
+
+        return $parmDocInfos;
+    }
+
+    /**
+     * 参数校验
+     * @param AopJoinPoint $object
+     * @return array
+     */
+    public static function  paramsCheck(AopJoinPoint $object) {
+
+        //region  通过php-aop扩展（详见https://github.com/AOP-PHP/AOP）获取运行时的函数信息
+        //获取实参
+        $arguments = $object->getArguments();
+        //获取类名称
+        $className = $object->getClassName();
+        //获取方法名称
+        $fucName   = $object->getMethodName();
+
+        // endregion
+
+        //反射获取函数注释部分 并对注释进行分割
+        $clsInstance = new ReflectionClass($className);
+        $fucIns      = $clsInstance->getMethod($fucName);
+        $doc       = $fucIns->getDocComment();
+        $paramDocs = self::getDocs($doc);
+
+        $paramDocInfos = self:: docsToParamDocInfos($paramDocs);
+        //获取函数名称
+        $paraNames = array();
+        foreach ($fucIns->getParameters() as $param) {
+            array_push($paraNames, $param->getName());
+        }
+
+        $paramInfos = array();
+        //查询缓存中是否有反射结果
+        $cache    = self::getCache();
+        $cacheKey = 'REFLECTIONCACHE_' . $className . '_' . $fucName;
+        if ($cache->hasKey($cacheKey)) {
+            $paramInfos = $cache->getData($cacheKey);
+        } else { //缓存中没有反射结果，则进行反射
+
+            //生成ParmDocInfo对象数组
+            foreach ($paraNames as $paramName) {
+                $paramDocInfo = null;
+                foreach ($paramDocInfos as $paramDoc) {
+                    if ($paramDoc->getName() == $paramName) {
+                        $paramDocInfo = $paramDoc;
+                        break;
+                    }
+                }
+                array_push($paramInfos, array('name' => $paramName, 'paramdocinfo' => $paramDocInfo));
+            }
+            //将反射结果存入缓存中
+            $cache->addData($cacheKey, $paramInfos, self::CACHE_DURATION);
+        }
+
+
+        $count = count($arguments);
+        for ($i = 0; $i < $count; $i++) {
+            $paramDocInfo = $paramInfos[$i]['paramdocinfo'];
+            if (!$paramDocInfo->isLegal($arguments[$i])) {
+                throw new ParamCheckException($paramInfos[$i]['name'], '参数类型校验与注释说明不匹配');
+            }
+        }
+    }
+
     /**
      * 根据注释的完整信息 解析出每条参数的注释内容
-     * @param $documents 函数注释内容
+     * @param string $documents 函数注释内容
+     * @return array
      */
     private function  getDocs($documents) {
         $outParams   = null;
@@ -18,7 +120,6 @@ class ParamFilter {
         //解析出函数注释中参数描述的部分
         preg_match_all("/\\@param([\\s\\S]*?)\\*/", $documents, $outParams);
         if (is_array($outParams)) {
-
             foreach ($outParams[1] as $paramStr) {
                 //获取注释中关于参数描述的部分
                 array_push($paramStrArr, trim(trim(trim($paramStr, '@param'), '*')));
@@ -27,33 +128,4 @@ class ParamFilter {
 
         return $paramStrArr;
     }
-
-    /**
-     * 解析函数的注释内容
-     * @param $className
-     * @param $fucName
-     */
-    public function resolveDoc($className, $fucName) {
-        //反射获取函数参数
-        $clsInstance = new ReflectionClass($className);
-        $fucIns      = $clsInstance->getMethod($fucName);
-
-        //获取函数注释部分的描述
-        $doc       = $fucIns->getDocComment();
-        $paramDocs = $this->getDocs($doc);
-
-        $paraNames = array();
-        //获取函数体中参数说明
-        $params = $fucIns->getParameters();
-        foreach ($params as $param) {
-            array_push($paraNames, $param->getName());
-        }
-
-        //todo 从缓存中获取已经反射够的注释解析结果
-
-        return array('docs' => $paramDocs);
-
-    }
-
-
 }
