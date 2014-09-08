@@ -14,10 +14,10 @@ abstract class ParamCheckResultFactory {
         //目前仅有一种CommonParamParamCheckResult一种实现
         switch ($resultName) {
             case self::COMMONRESULT:
-                return new CommonParamParamCheckResult();
+                return new CommonParamCheckResult();
                 break;
             default:
-                return new CommonParamParamCheckResult();
+                return new CommonParamCheckResult();
                 break;
         }
     }

@@ -1,6 +1,6 @@
 <?php
-namespace Cache;
-
+namespace cache;
+require_once('IDataCache.php');
 use Exception;
 
 /**
@@ -30,7 +30,7 @@ class SimpleCache implements IDataCache {
      * 加载缓存
      * @return mixed
      */
-    private function _loadCache() {
+    private function loadCache() {
         if (true === file_exists($this->getCacheDir())) {
             $file = file_get_contents($this->getCacheDir());
 
@@ -74,7 +74,7 @@ class SimpleCache implements IDataCache {
      * @return int
      */
     private function eraseExpired() {
-        $cacheData = $this->_loadCache();
+        $cacheData = $this->loadCache();
         if (true === is_array($cacheData)) {
             $counter = 0;
             foreach ($cacheData as $key => $entry) {
@@ -161,7 +161,7 @@ class SimpleCache implements IDataCache {
         $storeData = array(
             'time' => time(), 'expire' => $duration, 'data' => serialize($data)
         );
-        $dataArray = $this->_loadCache();
+        $dataArray = $this->loadCache();
         if (true === is_array($dataArray)) {
             $dataArray[$key] = $storeData;
         } else {
@@ -178,7 +178,7 @@ class SimpleCache implements IDataCache {
      * @return object
      */
     public function getData($key) {
-        $cachedData = $this->_loadCache();
+        $cachedData = $this->loadCache();
         $cacheInfo  = $cachedData[$key];
         if (!isset($cacheInfo)) {
             return null;
@@ -199,8 +199,8 @@ class SimpleCache implements IDataCache {
      * @return bool
      */
     public function  hasKey($key) {
-        if (false != $this->_loadCache()) {
-            $cachedData = $this->_loadCache();
+        if (false != $this->loadCache()) {
+            $cachedData = $this->loadCache();
 
             return isset($cachedData[$key]['data']);
         }
@@ -212,7 +212,7 @@ class SimpleCache implements IDataCache {
      * @return bool
      */
     public function  delKey($key) {
-        $cacheData = $this->_loadCache();
+        $cacheData = $this->loadCache();
         if (true === is_array($cacheData)) {
             if (true === isset($cacheData[$key])) {
                 unset($cacheData[$key]);

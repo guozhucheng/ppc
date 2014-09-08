@@ -5,9 +5,9 @@ namespace paramCheckResult;
 /**
  * 通用参数检查结果
  * Class CommonParamCheckResult
- * @package paramCheckReuslt
+ * @package paramCheckResult
  */
-class CommonParamParamCheckResult implements IParamCheckReuslt {
+class CommonParamCheckResult implements IParamCheckReuslt {
 
     /**
      * 设置参数检查结果
