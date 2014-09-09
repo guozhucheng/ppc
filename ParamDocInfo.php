@@ -96,9 +96,8 @@ class ParamDocInfo {
 
     /**
      * 构造函数
-
      */
-    function __construct(array $paramStr) {
+    function __construct($paramStr) {
         //均按照小写来处理
         $paramStr = strtolower($paramStr);
         $filters  = preg_split('/[\s]+/', $paramStr);
@@ -251,6 +250,10 @@ class ParamDocInfo {
         }
 
         return true;
+    }
+
+    public function getName() {
+        return $this->_name;
     }
 }
 

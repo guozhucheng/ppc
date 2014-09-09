@@ -36,8 +36,9 @@ class  ParamFilter {
      */
     private static function  getCache() {
         if (self::$_cache == null) {
-            $config       = array('name' => self::CACHE_BASE_NAME);
-            self::$_cache = DataCacheFactory::createCache(self::DEFAULT_CACHE, $config);
+            self::$_cache = DataCacheFactory::createCache(self::DEFAULT_CACHE, self::CACHE_BASE_NAME);
+            //todo temp
+            self::$_cache = null;
         }
 
         return self::$_cache;
@@ -69,69 +70,6 @@ class  ParamFilter {
         return $parmDocInfos;
     }
 
-    /**
-     * 参数校验
-     * @param AopJoinPoint $object
-     * @return array
-     */
-    public static function  paramsCheck(AopJoinPoint $object) {
-
-        //region  通过php-aop扩展（详见https://github.com/AOP-PHP/AOP）获取运行时的函数信息
-        //获取实参
-        $arguments = $object->getArguments();
-        //获取类名称
-        $className = $object->getClassName();
-        //获取方法名称
-        $fucName = $object->getMethodName();
-
-        // endregion
-
-        //反射获取函数注释部分 并对注释进行分割
-        $clsInstance = new ReflectionClass($className);
-        $fucIns      = $clsInstance->getMethod($fucName);
-        $doc         = $fucIns->getDocComment();
-        $paramDocs   = self::getDocs($doc);
-
-        $paramDocInfos = self:: docsToParamDocInfos($paramDocs);
-        //获取函数名称
-        $paraNames = array();
-        foreach ($fucIns->getParameters() as $param) {
-            array_push($paraNames, $param->getName());
-        }
-
-        $paramInfos = array();
-        //查询缓存中是否有反射结果
-        $cache    = self::getCache();
-        $cacheKey = 'REFLECTIONCACHE_' . $className . '_' . $fucName;
-        if ($cache->hasKey($cacheKey)) {
-            $paramInfos = $cache->getData($cacheKey);
-        } else { //缓存中没有反射结果，则进行反射
-
-            //生成ParmDocInfo对象数组
-            foreach ($paraNames as $paramName) {
-                $paramDocInfo = null;
-                foreach ($paramDocInfos as $paramDoc) {
-                    if ($paramDoc->getName() == $paramName) {
-                        $paramDocInfo = $paramDoc;
-                        break;
-                    }
-                }
-                array_push($paramInfos, array('name' => $paramName, 'paramdocinfo' => $paramDocInfo));
-            }
-            //将反射结果存入缓存中
-            $cache->addData($cacheKey, $paramInfos, self::CACHE_DURATION);
-        }
-
-
-        $count = count($arguments);
-        for ($i = 0; $i < $count; $i++) {
-            $paramDocInfo = $paramInfos[$i]['paramdocinfo'];
-            if (!$paramDocInfo->isLegal($arguments[$i])) {
-                $checkResult = self::getCheckResult();
-                $checkResult->setCheckResult($paramInfos[$i]['name'], '参数类型校验与注释说明不匹配');
-            }
-        }
-    }
 
     /**
      * 根据注释的完整信息 解析出每条参数的注释内容
@@ -152,4 +90,86 @@ class  ParamFilter {
 
         return $paramStrArr;
     }
+
+    /**
+     * 参数校验
+     * @param AopJoinPoint $object
+     * @return array
+     */
+    public static function  paramsCheck(AopJoinPoint $object = null) {
+
+        //region test
+        $arguments = array(1, 'str', '2014-9-9');
+        //获取类名称
+        $className = 'TestClass';
+        //获取方法名称
+        $fucName = 'testFuc1';
+
+        require_once('TestClass.php');
+        //endregion
+
+
+//        //region  通过php-aop扩展（详见https://github.com/AOP-PHP/AOP）获取运行时的函数信息
+//        //获取实参
+//        $arguments = $object->getArguments();
+//        //获取类名称
+//        $className = $object->getClassName();
+//        //获取方法名称
+//        $fucName = $object->getMethodName();
+//
+//        // endregion
+
+        //反射获取函数注释部分 并对注释进行分割
+        $clsInstance = new ReflectionClass($className);
+        $fucIns      = $clsInstance->getMethod($fucName);
+        $doc         = $fucIns->getDocComment();
+
+
+        $paramDocs     = self::getDocs($doc);
+        $paramDocInfos = self:: docsToParamDocInfos($paramDocs);
+        //获取函数名称
+        $paraNames = array();
+        foreach ($fucIns->getParameters() as $param) {
+            array_push($paraNames, $param->getName());
+        }
+
+        $paramInfos = array();
+        //查询缓存中是否有反射结果
+        $cache    = self::getCache();
+        $cacheKey = 'REFLECTIONCACHE_' . $className . '_' . $fucName;
+        if ($cache != null && $cache->hasKey($cacheKey)) {
+            $paramInfos = $cache->getData($cacheKey);
+        } else { //缓存中没有反射结果，则进行反射
+
+            //生成ParmDocInfo对象数组
+            foreach ($paraNames as $paramName) {
+                $paramDocInfo = null;
+
+                foreach ($paramDocInfos as $paramDoc) {
+                    if (trim($paramDoc->getName(), '$') == $paramName) {
+                        $paramDocInfo = $paramDoc;
+                        break;
+                    }
+                }
+                array_push($paramInfos, array('name' => $paramName, 'paramdocinfo' => $paramDocInfo));
+            }
+            //将反射结果存入缓存中
+            if ($cache != null) {
+                $cache->addData($cacheKey, $paramInfos, self::CACHE_DURATION);
+            }
+        }
+
+
+        $count = count($arguments);
+        for ($i = 0; $i < $count; $i++) {
+            $paramDocInfo = $paramInfos[$i]['paramdocinfo'];
+            if (!$paramDocInfo->isLegal($arguments[$i])) {
+                $checkResult = self::getCheckResult();
+                var_export($checkResult);
+                $checkResult->setCheckResult($paramInfos[$i]['name'], '参数类型校验与注释说明不匹配');
+            }
+        }
+    }
+
 }
+
