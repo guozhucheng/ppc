@@ -3,7 +3,6 @@
 namespace cache;
 /**
  * 定义缓存接口，如需不同的缓存实现，可通过实现该接口来完成
- * Created by guozhucheng@baidu.com
  */
 interface IDataCache {
     /**

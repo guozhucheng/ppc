@@ -1,6 +1,6 @@
 <?php
 namespace cache;
-require_once('IDataCache.php');
+require_once(__DIR__ . '/../cache/IDataCache.php');
 use Exception;
 
 /**
@@ -12,7 +12,7 @@ class SimpleCache implements IDataCache {
      * 缓存路径 默认 simple-cache
      * @var string
      */
-    private $_cachepath = 'simple-cachefile/';
+    private $_cachePath = 'simple-cachefile/';
 
     /**
      *缓存名称
@@ -30,7 +30,7 @@ class SimpleCache implements IDataCache {
      * 加载缓存
      * @return mixed
      */
-    private function loadCache() {
+    private function loadCacheInfo() {
         if (true === file_exists($this->getCacheDir())) {
             $file = file_get_contents($this->getCacheDir());
 
@@ -46,10 +46,10 @@ class SimpleCache implements IDataCache {
      */
     private function getCacheDir() {
         if (true === $this->_checkCacheDir()) {
-            $filename = $this->getCache();
+            $filename = $this->_cachename;
             $filename = preg_replace('/[^0-9a-z\.\_\-]/i', '', strtolower($filename));
 
-            return $this->_cachepath . $this->_getHash($filename) . $this->_extension;
+            return $this->_cachePath . $this->_getHash($filename) . $this->_extension;
         }
     }
 
@@ -63,7 +63,7 @@ class SimpleCache implements IDataCache {
                 $this->_cachename = $config;
             } else if (is_array($config)) {
                 $this->_cachename = $config['name'];
-                $this->_cachepath = $config['path'];
+                $this->_cachePath = $config['path'];
                 $this->_extension = $config['extension'];
             }
         }
@@ -74,7 +74,7 @@ class SimpleCache implements IDataCache {
      * @return int
      */
     private function eraseExpired() {
-        $cacheData = $this->loadCache();
+        $cacheData = $this->loadCacheInfo();
         if (true === is_array($cacheData)) {
             $counter = 0;
             foreach ($cacheData as $key => $entry) {
@@ -118,10 +118,10 @@ class SimpleCache implements IDataCache {
     }
 
     /**
-     * Check whether a timestamp is still in the duration
-     * @param integer $timestamp
-     * @param integer $expiration
-     * @return boolean
+     * 检查是否过期
+     * @param int $timestamp 时间戳
+     * @param int $expiration 过期时间（秒）
+     * @return bool
      */
     private function _checkExpired($timestamp, $expiration) {
         $result = false;
@@ -139,11 +139,11 @@ class SimpleCache implements IDataCache {
      * @throws Exception
      */
     private function _checkCacheDir() {
-        if (!is_dir($this->_cachepath) && !mkdir($this->_cachepath, 0775, true)) {
-            throw new Exception('Unable to create cache directory ' . $this->_cachepath);
-        } elseif (!is_readable($this->_cachepath) || !is_writable($this->_cachepath)) {
-            if (!chmod($this->_cachepath, 0775)) {
-                throw new Exception($this->_cachepath . ' must be readable and writeable');
+        if (!is_dir($this->_cachePath) && !mkdir($this->_cachePath, 0775, true)) {
+            throw new Exception('无法创建缓存目录' . $this->_cachePath);
+        } elseif (!is_readable($this->_cachePath) || !is_writable($this->_cachePath)) {
+            if (!chmod($this->_cachePath, 0775)) {
+                throw new Exception($this->_cachePath . ' 目录必须可读可写');
             }
         }
 
@@ -161,7 +161,7 @@ class SimpleCache implements IDataCache {
         $storeData = array(
             'time' => time(), 'expire' => $duration, 'data' => serialize($data)
         );
-        $dataArray = $this->loadCache();
+        $dataArray = $this->loadCacheInfo();
         if (true === is_array($dataArray)) {
             $dataArray[$key] = $storeData;
         } else {
@@ -178,7 +178,7 @@ class SimpleCache implements IDataCache {
      * @return object
      */
     public function getData($key) {
-        $cachedData = $this->loadCache();
+        $cachedData = $this->loadCacheInfo();
         $cacheInfo  = $cachedData[$key];
         if (!isset($cacheInfo)) {
             return null;
@@ -199,8 +199,8 @@ class SimpleCache implements IDataCache {
      * @return bool
      */
     public function  hasKey($key) {
-        if (false != $this->loadCache()) {
-            $cachedData = $this->loadCache();
+        if (false != $this->loadCacheInfo()) {
+            $cachedData = $this->loadCacheInfo();
 
             return isset($cachedData[$key]['data']);
         }
@@ -212,7 +212,7 @@ class SimpleCache implements IDataCache {
      * @return bool
      */
     public function  delKey($key) {
-        $cacheData = $this->loadCache();
+        $cacheData = $this->loadCacheInfo();
         if (true === is_array($cacheData)) {
             if (true === isset($cacheData[$key])) {
                 unset($cacheData[$key]);

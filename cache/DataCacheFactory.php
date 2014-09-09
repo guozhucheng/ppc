@@ -1,5 +1,7 @@
 <?php
 namespace cache;
+require_once(__DIR__ . '/../cache/IDataCache.php');
+require_once(__DIR__ . '/../cache/SimpleCache.php');
 
 /**
  * 数据缓存抽象工厂类
@@ -13,11 +15,13 @@ abstract class DataCacheFactory {
 
     /**
      * 获取缓存对象实例
-     * @param $cacheName
+     * @param string     $cacheName
+     * @param null|array $config
      * @return IDataCache SimpleCache
      */
+
     static function  createCache($cacheName, $config = null) {
-        //todo 目前仅实现了 SimpleCache一种缓存实现s
+        //目前仅实现了 SimpleCache一种缓存实现
         switch ($cacheName) {
             case self::SIMPLECACHE:
                 return new SimpleCache($config);

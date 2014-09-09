@@ -2,22 +2,33 @@
 
 use cache\DataCacheFactory;
 use cache\IDataCache;
-use paramCheckResult\ParamCheckException;
+use paramCheckResult\IParamCheckResult;
+use paramCheckResult\ParamCheckResultFactory;
 
-require_once('TestClass.php');
-require_once('ParamDocInfo.php');
-
+//require_once('TestClass.php');
+require_once(__DIR__ . '/ParamDocInfo.php');
+require_once(__DIR__ . '/cache/IDataCache.php');
+require_once(__DIR__ . '/cache/DataCacheFactory.php');
+require_once(__DIR__ . '/paramCheckResult/IParamCheckResult.php');
+require_once(__DIR__ . '/paramCheckResult/ParamCheckResultFactory.php');
 
 /**
  * 参数过滤器
  * Created by guozhucheng@baidu.com
- * DateTime: 14-8-31 上午1:50
  */
 class  ParamFilter {
+    //缓存key基础前缀
     const   CACHE_BASE_NAME = 'PARAMFILLTER_CACHE';
-    const   DEFAULT_CACHE   = 'SimpleCache';
-    const   CACHE_DURATION  = 300; //默认缓存5分钟
+    //默认缓存名称
+    const   DEFAULT_CACHE = 'SimpleCache';
+    //默认参数结果实现类
+    const  COMMON_RESULT   = 'CommonParamParamCheckResult';
+    const   CACHE_DURATION = 300; //默认缓存5分钟
+    //缓存对象
     private static $_cache;
+
+    //检查结果对象
+    private static $_checkResult;
 
     /**
      * 获取缓存对象
@@ -30,6 +41,18 @@ class  ParamFilter {
         }
 
         return self::$_cache;
+    }
+
+    /**
+     * 获取参数结果对象
+     * @return IParamCheckResult
+     */
+    private static function getCheckResult() {
+        if (self::$_checkResult == null) {
+            self::$_checkResult = ParamCheckResultFactory::createReuslt(self::COMMON_RESULT);
+        }
+
+        return self::$_checkResult;
     }
 
     /**
@@ -59,15 +82,15 @@ class  ParamFilter {
         //获取类名称
         $className = $object->getClassName();
         //获取方法名称
-        $fucName   = $object->getMethodName();
+        $fucName = $object->getMethodName();
 
         // endregion
 
         //反射获取函数注释部分 并对注释进行分割
         $clsInstance = new ReflectionClass($className);
         $fucIns      = $clsInstance->getMethod($fucName);
-        $doc       = $fucIns->getDocComment();
-        $paramDocs = self::getDocs($doc);
+        $doc         = $fucIns->getDocComment();
+        $paramDocs   = self::getDocs($doc);
 
         $paramDocInfos = self:: docsToParamDocInfos($paramDocs);
         //获取函数名称
@@ -104,7 +127,8 @@ class  ParamFilter {
         for ($i = 0; $i < $count; $i++) {
             $paramDocInfo = $paramInfos[$i]['paramdocinfo'];
             if (!$paramDocInfo->isLegal($arguments[$i])) {
-                throw new ParamCheckException($paramInfos[$i]['name'], '参数类型校验与注释说明不匹配');
+                $checkResult = self::getCheckResult();
+                $checkResult->setCheckResult($paramInfos[$i]['name'], '参数类型校验与注释说明不匹配');
             }
         }
     }
