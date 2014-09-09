@@ -1,7 +1,6 @@
 <?php
 namespace paramCheckResult;
-require_once(__DIR__ . '/../paramCheckResult/IParamCheckResult.php');
-require_once(__DIR__ . '/../paramCheckResult/CommonParamCheckResult.php');
+
 
 /**
  * 参数检查结果抽象工厂类

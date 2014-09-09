@@ -1,8 +1,5 @@
 <?php
 namespace cache;
-require_once(__DIR__ . '/../cache/IDataCache.php');
-require_once(__DIR__ . '/../cache/SimpleCache.php');
-
 /**
  * 数据缓存抽象工厂类
  * Created by guozhucheng@baidu.com

@@ -7,10 +7,8 @@ use paramCheckResult\ParamCheckResultFactory;
 
 //require_once('TestClass.php');
 require_once(__DIR__ . '/ParamDocInfo.php');
-require_once(__DIR__ . '/cache/IDataCache.php');
-require_once(__DIR__ . '/cache/DataCacheFactory.php');
-require_once(__DIR__ . '/paramCheckResult/IParamCheckResult.php');
-require_once(__DIR__ . '/paramCheckResult/ParamCheckResultFactory.php');
+require_once(__DIR__ . '/cache/cacheloader.php');
+require_once(__DIR__ . '/paramCheckResult/checkresultloader.php');
 
 /**
  * 参数过滤器
@@ -74,21 +72,21 @@ class  ParamFilter {
      * @param AopJoinPoint $object
      * @return array
      */
-    public static function  paramsCheck(AopJoinPoint $object) {
+    public static function  paramsCheck($className, $method, $arguments) {
 
-        //region  通过php-aop扩展（详见https://github.com/AOP-PHP/AOP）获取运行时的函数信息
-        //获取实参
-        $arguments = $object->getArguments();
-        //获取类名称
-        $className = $object->getClassName();
-        //获取方法名称
-        $fucName = $object->getMethodName();
-
-        // endregion
+//        //region  通过php-aop扩展（详见https://github.com/AOP-PHP/AOP）获取运行时的函数信息
+//        //获取实参
+//        $arguments = $object->getArguments();
+//        //获取类名称
+//        $className = $object->getClassName();
+//        //获取方法名称
+//        $fucName = $object->getMethodName();
+//
+//        // endregion
 
         //反射获取函数注释部分 并对注释进行分割
         $clsInstance = new ReflectionClass($className);
-        $fucIns      = $clsInstance->getMethod($fucName);
+        $fucIns      = $clsInstance->getMethod($method);
         $doc         = $fucIns->getDocComment();
         $paramDocs   = self::getDocs($doc);
 
@@ -102,7 +100,7 @@ class  ParamFilter {
         $paramInfos = array();
         //查询缓存中是否有反射结果
         $cache    = self::getCache();
-        $cacheKey = 'REFLECTIONCACHE_' . $className . '_' . $fucName;
+        $cacheKey = 'REFLECTIONCACHE_' . $className . '_' . $method;
         if ($cache->hasKey($cacheKey)) {
             $paramInfos = $cache->getData($cacheKey);
         } else { //缓存中没有反射结果，则进行反射

@@ -1,26 +1,20 @@
 <?php
-
 /**
- * 类工厂，用于产生类的实例
- * 这里通过工厂+魔术方法的方式实现了简单的AOP框架
- * 在实际的项目中，倾向于使用AOP框架来实现切片式的编程以提高代码的可读性和性能
- * Class ClassFactory
+ * Created by guozhucheng@baidu.com
+ * DateTime: 14-9-10 上午2:23
  */
-class ClassFactory {
+namespace aop;
 
-    /**
-     * 获取工厂加工后的实例
-     * @param class $instance
-     * @return AopClass
-     */
-    public function getInstance($instance) {
-        return new AopClass($instance);
-    }
-}
+use Exception;
+use ParamFilter;
 
 class AopClass {
     private $_instance;
 
+    /**
+     * 构造函数
+     * @param $instance
+     */
     public function __construct($instance) {
         $this->_instance = $instance;
     }

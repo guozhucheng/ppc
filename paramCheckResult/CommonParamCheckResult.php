@@ -1,8 +1,6 @@
 <?php
 
 namespace paramCheckResult;
-require_once(__DIR__ . '/../paramCheckResult/IParamCheckResult.php');
-require_once(__DIR__ . '/../paramCheckResult/ParamCheckException.php');
 
 /**
  * 通用参数检查结果

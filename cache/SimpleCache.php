@@ -1,6 +1,6 @@
 <?php
 namespace cache;
-require_once(__DIR__ . '/../cache/IDataCache.php');
+
 use Exception;
 
 /**
