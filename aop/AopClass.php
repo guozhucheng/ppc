@@ -27,9 +27,9 @@ class AopClass {
     }
 
     /**
-     * todo
-     * @param $method
-     * @param $arguments
+     * 魔术方法 用于在函数执行前执行参数检查
+     * @param string $method 方法名称
+     * @param array  $arguments 实参数组
      * @return mixed
      * @throws \Exception
      */

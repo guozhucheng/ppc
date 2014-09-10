@@ -22,10 +22,8 @@ abstract class ParamCheckResultFactory {
         switch ($resultName) {
             case self::COMMONRESULT:
                 return new CommonParamCheckResult();
-                break;
             default:
                 return new CommonParamCheckResult();
-                break;
         }
     }
 } 

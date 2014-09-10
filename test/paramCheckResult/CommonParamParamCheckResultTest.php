@@ -13,8 +13,7 @@ require_once(__DIR__ . '/../../paramCheckResult/ParamCheckException.php');
 
 /**
  *  CommonParamParamCheckResult 单元测试
- * Class CommonParamParamCheckResultTest
- * @package test\paramCheckResult
+ *  Class CommonParamParamCheckResultTest
  */
 class CommonParamParamCheckResultTest extends PHPUnit_Framework_TestCase {
 

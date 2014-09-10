@@ -29,45 +29,6 @@ class  ParamFilter {
     private static $_checkResult;
 
     /**
-     * 获取缓存对象
-     * @return IDataCache
-     */
-    private static function  getCache() {
-        if (self::$_cache == null) {
-            self::$_cache = DataCacheFactory::createCache(self::DEFAULT_CACHE, self::CACHE_BASE_NAME);
-        }
-
-        return self::$_cache;
-    }
-
-    /**
-     * 获取参数结果对象
-     * @return IParamCheckResult
-     */
-    private static function getCheckResult() {
-        if (self::$_checkResult == null) {
-            self::$_checkResult = ParamCheckResultFactory::createReuslt(self::COMMON_RESULT);
-        }
-
-        return self::$_checkResult;
-    }
-
-    /**
-     * todo _
-     * 根据分割后的函数注释获取ParamDocInfo对象数组
-     * @param array $docs
-     * @return array
-     */
-    private static function docsToParamDocInfos(array $docs) {
-        $parmDocInfos = array();
-        foreach ($docs as $doc) {
-            array_push($parmDocInfos, new ParamDocInfo($doc));
-        }
-
-        return $parmDocInfos;
-    }
-
-    /**
      * 执行参数检查
      * @param string $className 类名称
      * @param string $method 函数名
@@ -124,6 +85,45 @@ class  ParamFilter {
             }
         }
     }
+
+    /**
+     * 获取缓存对象
+     * @return IDataCache
+     */
+    private static function  getCache() {
+        if (self::$_cache == null) {
+            self::$_cache = DataCacheFactory::createCache(self::DEFAULT_CACHE, self::CACHE_BASE_NAME);
+        }
+
+        return self::$_cache;
+    }
+
+    /**
+     * 获取参数结果对象
+     * @return IParamCheckResult
+     */
+    private static function getCheckResult() {
+        if (self::$_checkResult == null) {
+            self::$_checkResult = ParamCheckResultFactory::createReuslt(self::COMMON_RESULT);
+        }
+
+        return self::$_checkResult;
+    }
+
+    /**
+     * 根据分割后的函数注释获取ParamDocInfo对象数组
+     * @param array $docs
+     * @return array
+     */
+    private static function docsToParamDocInfos(array $docs) {
+        $parmDocInfos = array();
+        foreach ($docs as $doc) {
+            array_push($parmDocInfos, new ParamDocInfo($doc));
+        }
+
+        return $parmDocInfos;
+    }
+
 
     /**
      * 根据注释的完整信息 解析出每条参数的注释内容
