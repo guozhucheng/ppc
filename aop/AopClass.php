@@ -1,13 +1,15 @@
 <?php
-/**
- * Created by guozhucheng@baidu.com
- * DateTime: 14-9-10 上午2:23
- */
+
 namespace aop;
 
 use Exception;
 use ParamFilter;
 
+/**
+ * 简单的aop实现
+ * Class AopClass
+ * @package aop
+ */
 class AopClass {
     private $_instance;
 
@@ -26,9 +28,6 @@ class AopClass {
         //执行参数检查
         $className = get_class($this->_instance);
         ParamFilter::paramsCheck($className, $method, $arguments);
-
-//        var_export(array($className, $method));
-//        var_export($arguments);
 
         return call_user_func_array(array($this->_instance, $method), $arguments);
     }
