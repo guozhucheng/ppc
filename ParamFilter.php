@@ -4,8 +4,8 @@ use cache\DataCacheFactory;
 use cache\IDataCache;
 use paramCheckResult\IParamCheckResult;
 use paramCheckResult\ParamCheckResultFactory;
+use paramCheckResult\ParamIllegalException;
 
-//require_once('TestClass.php');
 require_once(__DIR__ . '/ParamDocInfo.php');
 require_once(__DIR__ . '/cache/loader.php');
 require_once(__DIR__ . '/paramCheckResult/loader.php');
@@ -36,8 +36,6 @@ class  ParamFilter {
         if (self::$_cache == null) {
             self::$_cache = DataCacheFactory::createCache(self::DEFAULT_CACHE, self::CACHE_BASE_NAME);
         }
-//todo remove
-        self::$_cache = null;
 
         return self::$_cache;
     }
@@ -69,24 +67,23 @@ class  ParamFilter {
     }
 
     /**
-     * 参数校验
-     * @param AopJoinPoint $object
-     * @return array
+     * 执行参数检查
+     * @param string $className 类名称
+     * @param string $method 函数名
+     * @param array  $arguments 实参数组
+     * @throws ParamIllegalException 如果参数不合法则抛出异常
      */
     public static function  paramsCheck($className, $method, $arguments) {
 
-
         $paramInfos = array();
+
         //查询缓存中是否有反射结果
         $cache    = self::getCache();
         $cacheKey = 'REFLECTIONCACHE_' . $className . '_' . $method;
 
-        //
-        if ($cache != null && $cache->hasKey($cacheKey)) {
-            $paramInfos = $cache->getData($cacheKey);
-        } else { //缓存中没有反射结果，则进行反射
-
-            //反射获取函数注释部分
+        //缓存中没有数据，则进行反射，并将反射的结果加入缓存中
+        if ($cache == null || !$cache->hasKey($cacheKey)) {
+            //反射获取函数注释部分 并对注释进行分割
             $clsInstance = new ReflectionClass($className);
             $fucIns      = $clsInstance->getMethod($method);
             $doc         = $fucIns->getDocComment();
@@ -113,15 +110,16 @@ class  ParamFilter {
             if ($cache != null) {
                 $cache->addData($cacheKey, $paramInfos, self::CACHE_DURATION);
             }
+        } else { //缓存中没有反射结果，则进行反射
+            $paramInfos = $cache->getData($cacheKey);
         }
 
-
+        //实参的个数
         $count = count($arguments);
         for ($i = 0; $i < $count; $i++) {
             $paramDocInfo = $paramInfos[$i]['paramdocinfo'];
             if (!$paramDocInfo->isLegal($arguments[$i])) {
-                $checkResult = self::getCheckResult();
-                $checkResult->setCheckResult($paramInfos[$i]['name'], '参数类型校验与注释说明不匹配');
+                throw new ParamIllegalException($paramInfos[$i]['name'], '参数类型校验与注释说明不匹配');
             }
         }
     }

@@ -8,6 +8,8 @@ namespace paramCheckResult;
  * @package paramCheckResult
  */
 abstract class ParamCheckResultFactory {
+
+    //通用检查结果类名称
     const  COMMONRESULT = 'CommonParamParamCheckResult';
 
     /**

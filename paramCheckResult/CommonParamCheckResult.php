@@ -16,7 +16,7 @@ class CommonParamCheckResult implements IParamCheckResult {
      * @return mixed
      */
     public function setCheckResult($paramName, $reason) {
-        $exception = new ParamCheckException($paramName, $reason);
+        $exception = new ParamIllegalException($paramName, $reason);
         throw $exception;
     }
 }

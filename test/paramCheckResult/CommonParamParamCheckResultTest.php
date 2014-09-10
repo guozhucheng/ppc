@@ -3,7 +3,7 @@
 namespace test\paramCheckResult;
 
 use paramCheckResult\CommonParamCheckResult;
-use paramCheckResult\ParamCheckException;
+use paramCheckResult\ParamIllegalException;
 use PHPUnit_Framework_TestCase;
 
 require_once(__DIR__ . '/../../paramCheckResult/IParamCheckResult.php');
@@ -27,9 +27,9 @@ class CommonParamParamCheckResultTest extends PHPUnit_Framework_TestCase {
             $object = new CommonParamCheckResult();
             $object->setCheckResult('paramName', 'reason');
 
-        } catch (ParamCheckException $exception) {
+        } catch (ParamIllegalException $exception) {
             //SetCheckResult 函数会抛出异常，断言异常
-            $res = new ParamCheckException('paramName', 'reason');
+            $res = new ParamIllegalException('paramName', 'reason');
             $this->assertEquals($res, $exception);
 
             return;

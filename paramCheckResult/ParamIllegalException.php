@@ -5,10 +5,9 @@ namespace paramCheckResult;
 use Exception;
 
 /**
- * 参数校验抽象结果自定义异常
- * Created by guozhucheng@baidu.com
+ * 参数非法时抛出的异常
  */
-class ParamCheckException extends Exception {
+class ParamIllegalException extends Exception {
 
     /**
      * 参数名称

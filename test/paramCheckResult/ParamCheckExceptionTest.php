@@ -2,7 +2,7 @@
 
 namespace test\paramCheckResult;
 
-use paramCheckResult\ParamCheckException;
+use paramCheckResult\ParamIllegalException;
 use PHPUnit_Framework_TestCase;
 
 require_once(__DIR__ . '/../../paramCheckResult/ParamCheckException.php');
@@ -17,7 +17,7 @@ class ParamCheckExceptionTest extends PHPUnit_Framework_TestCase {
      * 测试函数 getName
      */
     public function  testGetName() {
-        $paramCheckException = new ParamCheckException('paramName', 'paramMessage');
+        $paramCheckException = new ParamIllegalException('paramName', 'paramMessage');
         $ret                 = $paramCheckException->getName();
         $this->assertEquals($ret, 'paramName');
     }

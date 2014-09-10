@@ -1,8 +1,10 @@
 <?php
 
 namespace aop;
-
+require_once(__DIR__ . '/../paramCheckResult/loader.php');
 use Exception;
+use paramCheckResult\ParamCheckResultFactory;
+use paramCheckResult\ParamIllegalException;
 use ParamFilter;
 
 /**
@@ -11,7 +13,10 @@ use ParamFilter;
  * @package aop
  */
 class AopClass {
+    //通用检查结果类名称
+    const  COMMONRESULT = 'CommonParamParamCheckResult';
     private $_instance;
+
 
     /**
      * 构造函数
@@ -25,9 +30,13 @@ class AopClass {
         if (!method_exists($this->_instance, $method)) {
             throw new Exception($method . '方法未定义');
         }
-        //执行参数检查
-        $className = get_class($this->_instance);
-        ParamFilter::paramsCheck($className, $method, $arguments);
+        try { //执行参数检查
+            ParamFilter::paramsCheck(get_class($this->_instance), $method, $arguments);
+        } catch (ParamIllegalException $e) { //捕获到异常，参数校验失败
+            $checkResult = ParamCheckResultFactory::createReuslt(self::COMMONRESULT);
+
+            return $checkResult->setCheckResult($e->getName(), $e->getMessage());
+        }
 
         return call_user_func_array(array($this->_instance, $method), $arguments);
     }
