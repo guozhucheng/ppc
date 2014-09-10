@@ -27,9 +27,6 @@ class AopClass {
         $className = get_class($this->_instance);
         ParamFilter::paramsCheck($className, $method, $arguments);
 
-//        var_export(array($className, $method));
-//        var_export($arguments);
-
         return call_user_func_array(array($this->_instance, $method), $arguments);
     }
 }
