@@ -139,6 +139,7 @@ class SimpleCache implements IDataCache {
      * @throws Exception
      */
     private function _checkCacheDir() {
+       var_dump($this->_cachePath);
         if (!is_dir($this->_cachePath) && !mkdir($this->_cachePath, 0775, true)) {
             throw new Exception('无法创建缓存目录' . $this->_cachePath);
         } elseif (!is_readable($this->_cachePath) || !is_writable($this->_cachePath)) {

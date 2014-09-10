@@ -7,8 +7,8 @@ use paramCheckResult\ParamCheckResultFactory;
 
 //require_once('TestClass.php');
 require_once(__DIR__ . '/ParamDocInfo.php');
-require_once(__DIR__ . '/cache/cacheloader.php');
-require_once(__DIR__ . '/paramCheckResult/checkresultloader.php');
+require_once(__DIR__ . '/cache/loader.php');
+require_once(__DIR__ . '/paramCheckResult/loader.php');
 
 /**
  * 参数过滤器
@@ -34,9 +34,10 @@ class  ParamFilter {
      */
     private static function  getCache() {
         if (self::$_cache == null) {
-            $config       = array('name' => self::CACHE_BASE_NAME);
-            self::$_cache = DataCacheFactory::createCache(self::DEFAULT_CACHE, $config);
+            self::$_cache = DataCacheFactory::createCache(self::DEFAULT_CACHE, self::CACHE_BASE_NAME);
         }
+//todo remove
+        self::$_cache = null;
 
         return self::$_cache;
     }
@@ -101,7 +102,7 @@ class  ParamFilter {
         //查询缓存中是否有反射结果
         $cache    = self::getCache();
         $cacheKey = 'REFLECTIONCACHE_' . $className . '_' . $method;
-        if ($cache->hasKey($cacheKey)) {
+        if ($cache != null && $cache->hasKey($cacheKey)) {
             $paramInfos = $cache->getData($cacheKey);
         } else { //缓存中没有反射结果，则进行反射
 
@@ -117,7 +118,9 @@ class  ParamFilter {
                 array_push($paramInfos, array('name' => $paramName, 'paramdocinfo' => $paramDocInfo));
             }
             //将反射结果存入缓存中
-            $cache->addData($cacheKey, $paramInfos, self::CACHE_DURATION);
+            if ($cache != null) {
+                $cache->addData($cacheKey, $paramInfos, self::CACHE_DURATION);
+            }
         }
 
 

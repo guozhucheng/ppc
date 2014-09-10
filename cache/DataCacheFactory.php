@@ -16,7 +16,6 @@ abstract class DataCacheFactory {
      * @param null|array $config
      * @return IDataCache SimpleCache
      */
-
     static function  createCache($cacheName, $config = null) {
         //目前仅实现了 SimpleCache一种缓存实现
         switch ($cacheName) {

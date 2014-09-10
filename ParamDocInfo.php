@@ -105,7 +105,7 @@ class ParamDocInfo {
         foreach ($filters as $filter) {
             //当前filter是参数名称
             if (!empty($filter) && substr($filter, 0, 1) == '$') {
-                $this->_name = $filter;
+                $this->_name = trim($filter, '$');
             } else {
                 switch ($filter) {
                     //region 构造类型

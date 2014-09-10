@@ -13,7 +13,7 @@ class ClassFactory {
      * @param class $instance
      * @return \aop\AopClass
      */
-    public function getInstance($instance) {
+    public static function getInstance($instance) {
         return new AopClass($instance);
     }
 }

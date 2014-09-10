@@ -24,9 +24,12 @@ class AopClass {
             throw new Exception($method . '方法未定义');
         }
         //执行参数检查
-        ParamFilter::paramsCheck(get_class($this->_instance), $method, $arguments);
-        $realMethod = array($this->_instance, $method);
+        $className = get_class($this->_instance);
+        ParamFilter::paramsCheck($className, $method, $arguments);
 
-        return call_user_func($realMethod, $arguments);
+//        var_export(array($className, $method));
+//        var_export($arguments);
+
+        return call_user_func_array(array($this->_instance, $method), $arguments);
     }
 }
