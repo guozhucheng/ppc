@@ -75,37 +75,29 @@ class  ParamFilter {
      */
     public static function  paramsCheck($className, $method, $arguments) {
 
-//        //region  通过php-aop扩展（详见https://github.com/AOP-PHP/AOP）获取运行时的函数信息
-//        //获取实参
-//        $arguments = $object->getArguments();
-//        //获取类名称
-//        $className = $object->getClassName();
-//        //获取方法名称
-//        $fucName = $object->getMethodName();
-//
-//        // endregion
-
-        //反射获取函数注释部分 并对注释进行分割
-        $clsInstance = new ReflectionClass($className);
-        $fucIns      = $clsInstance->getMethod($method);
-        $doc         = $fucIns->getDocComment();
-        $paramDocs   = self::getDocs($doc);
-
-        $paramDocInfos = self:: docsToParamDocInfos($paramDocs);
-        //获取函数名称
-        $paraNames = array();
-        foreach ($fucIns->getParameters() as $param) {
-            array_push($paraNames, $param->getName());
-        }
 
         $paramInfos = array();
         //查询缓存中是否有反射结果
         $cache    = self::getCache();
         $cacheKey = 'REFLECTIONCACHE_' . $className . '_' . $method;
+
+        //
         if ($cache != null && $cache->hasKey($cacheKey)) {
             $paramInfos = $cache->getData($cacheKey);
         } else { //缓存中没有反射结果，则进行反射
 
+            //反射获取函数注释部分
+            $clsInstance = new ReflectionClass($className);
+            $fucIns      = $clsInstance->getMethod($method);
+            $doc         = $fucIns->getDocComment();
+            $paramDocs   = self::getDocs($doc);
+
+            $paramDocInfos = self:: docsToParamDocInfos($paramDocs);
+            //获取函数名称
+            $paraNames = array();
+            foreach ($fucIns->getParameters() as $param) {
+                array_push($paraNames, $param->getName());
+            }
             //生成ParmDocInfo对象数组
             foreach ($paraNames as $paramName) {
                 $paramDocInfo = null;
