@@ -26,6 +26,13 @@ class AopClass {
         $this->_instance = $instance;
     }
 
+    /**
+     * todo
+     * @param $method
+     * @param $arguments
+     * @return mixed
+     * @throws \Exception
+     */
     public function __call($method, $arguments) {
         if (!method_exists($this->_instance, $method)) {
             throw new Exception($method . '方法未定义');
