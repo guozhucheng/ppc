@@ -1,9 +1,6 @@
 <?php
 namespace test\cache;
-require_once('../../cache/SimpleCache.php');
-require_once('../../cache/IDataCache.php');
-require_once('../../cache/DataCacheFactory.php');
-
+require_once(__DIR__ . '/../../cache/loader.php');
 
 use cache\DataCacheFactory;
 use cache\SimpleCache;
