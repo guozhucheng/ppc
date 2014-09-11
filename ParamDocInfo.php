@@ -40,62 +40,9 @@ class ParamDocInfo {
     const  NULLABLE = 'null';
     const  NOTNULL  = 'notnull';
 
-
-    /**
-     * 判断是否为整数
-     * @param $val
-     * @return bool
-     */
-    private static function  isInt($val) {
-        if (preg_match("/^-?[1-9]{1,21}\\d*$|^0$/", $val)) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * 是否为无符号证书
-     * @param $val
-     * @return bool
-     */
-    private static function  isuInt($val) {
-        if (preg_match("/^[1-9]{1,21}\\d*$|^0$/", $val)) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * 判断是否是浮点数
-     * @param $val
-     * @return bool
-     */
-    private static function isFloat($val) {
-        if (is_numeric($val) && is_float(floatval($val))) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * 判断是否是date类型
-     * @param $string
-     * @return bool
-     */
-    private static function isDate($str) {
-        $result = preg_match("/^((((1[6-9]|[2-9]\\d)\\d{2})-(0?[13578]|1[02])-(0?[1-9]|[12]\\d|3[01]))|(((1[6-9]|[2-9]\\d)\\d{2})-(0?[13456789]|1[012])-(0?[1-9]|[12]\\d|30))|(((1[6-9]|[2-9]\\d)\\d{2})-0?2-(0?[1-9]|1\\d|2[0-8]))|(((1[6-9]|[2-9]\\d)(0[48]|[2468][048]|[13579][26])|((16|[2468][048]|[3579][26])00))-0?2-29-)) (20|21|22|23|[0-1]?\\d):[0-5]?\\d:[0-5]?\\d$/", $str);
-        if ($result) {
-            return true;
-        }
-
-        return false;
-    }
-
     /**
      * 构造函数
+     * @param string $paramStr 注释分割后的一条记录如 string notnull $p1
      */
     function __construct($paramStr) {
         //均按照小写来处理
@@ -179,6 +126,66 @@ class ParamDocInfo {
     }
 
     /**
+     * 获取参数名称
+     * @return string
+     */
+    public function getName() {
+        return $this->_name;
+    }
+    /**
+     * 判断是否为整数
+     * @param $val
+     * @return bool
+     */
+    private static function  isInt($val) {
+        if (preg_match("/^-?\+?[1-9]{1,21}\\d*$|^0$/", $val)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * 是否为无符号整数
+     * @param $val
+     * @return bool
+     */
+    private static function  isuInt($val) {
+        if (preg_match("/^\+?[1-9]{1,21}\\d*$|^0$/", $val)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * 判断是否是浮点数
+     * @param object $val 待验证值
+     * @return bool
+     */
+    private static function isFloat($val) {
+        if (is_numeric($val) && is_float(floatval($val))) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * 判断是否是date类型
+     * @param $val 待验证值
+     * @return bool
+     */
+    private static function isDate($val) {
+        $t = strtotime($val);
+        $m = date('m',$t);
+        $d = date('d',$t);
+        $y = date('Y',$t);
+        return checkdate ($m, $d, $y);
+    }
+
+
+    /**
      * 判断参数值是否符合当前参数规则
      * @param $val
      * @return bool
@@ -250,10 +257,6 @@ class ParamDocInfo {
         }
 
         return true;
-    }
-
-    public function getName() {
-        return $this->_name;
     }
 }
 

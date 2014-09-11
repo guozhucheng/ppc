@@ -15,21 +15,26 @@ require_once(__DIR__ . '/aop/loader.php');
 class Demo {
 
     /**
-     * 被验证方法
-     * @param int     $p1 第一个参数，用于验证整数(int)
-     * @param         string notnull $p2 第二个参数，用于验证string同时不为空
-     * @param date    $p3 date参数类型
-     * @return  array
+     * @param int    $p1
+     * @param uint   $p2
+     * @param float  $p3
+     * @param bool   $p4
+     * @param        string notnull $p5
+     * @param  array $p6
+     * @param  date  $p7
      */
-    public function  method1($p1, $p2, $p3) {
-        echo '<br>' . 'parm check pass';
+    public function  demoMethod($p1, $p2, $p3, $p4, $p5, $p6, $p7, $p8) {
+        echo '<br> invoke method';
     }
 }
 
 $ins = ClassFactory::getInstance(new Demo());
 
-$ins->method1('1', 'str', '2014-9-9 12:12:12');
+//pass
+$ins->demoMethod(-10, 2, 3.14, true, 'str', array(), '2014-9-9 12:12:122');
 
-$ins->method1('1a', 'str', '2014-9-9 12:12:12');
-$ins->method1('1', null, '2014-9-9 12:12:12');
+//p2 is illegal
+$ins->demoMethod(-10, -2, 3.14, true, 'str', array(), '2014-9-9 12:12:122');
 
+//p5 is illegal
+$ins->demoMethod(-10, 2, 3.14, true, null, array(), '2014-9-9 12:12:122');

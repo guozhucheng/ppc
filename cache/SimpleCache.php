@@ -27,11 +27,114 @@ class SimpleCache implements IDataCache {
     private $_extension = '.cache';
 
     /**
+     * 构造函数
+     * @param null|array $config
+     */
+    public function __construct($config = null) {
+        if (true === isset($config)) {
+            if (is_string($config)) {
+                $this->_cachename = $config;
+            } else if (is_array($config)) {
+                $this->_cachename = $config['name'];
+                $this->_cachePath = $config['path'];
+                $this->_extension = $config['extension'];
+            }
+        }
+    }
+
+    /**
+     * 添加缓存数据
+     * @param string $key 缓存key
+     * @param object $data 缓存数据
+     * @param int    $duration 缓存时间（秒）
+     * @return bool
+     */
+    public function  addData($key, $data, $duration) {
+        $storeData = array('time' => time(), 'expire' => $duration, 'data' => serialize($data));
+        $dataArray = $this->loadCacheInfo();
+        if (true === is_array($dataArray)) {
+            $dataArray[$key] = $storeData;
+        } else {
+            $dataArray = array($key => $storeData);
+        }
+        $cacheData = json_encode($dataArray);
+
+        return self::filePutContents($this->getCacheDir(), $cacheData) > 0;
+    }
+
+    /**
+     * 获取缓存数据
+     * @param string $key 缓存key
+     * @return object
+     */
+    public function getData($key) {
+
+        $cachedData = $this->loadCacheInfo();
+        $cacheInfo  = $cachedData[$key];
+        if (!isset($cacheInfo)) {
+            return null;
+        }
+        if (true === $this->checkExpired($cacheInfo['time'], $cacheInfo['expire'])) {
+            //删除过期的缓存数据
+            $this->eraseExpired();
+
+            return null;
+        }
+        return unserialize($cachedData[$key]['data']);
+    }
+
+    /**
+     * 缓存是否存在
+     * @param string $key 缓存key
+     * @return bool
+     */
+    public function  hasKey($key) {
+        if (false != $this->loadCacheInfo()) {
+            $cachedData = $this->loadCacheInfo();
+
+            return isset($cachedData[$key]['data']);
+        }
+    }
+
+    /**
+     * 删除某个缓存key
+     * @param string $key
+     * @return bool
+     */
+    public function  delKey($key) {
+        $cacheData = $this->loadCacheInfo();
+        if (true === is_array($cacheData)) {
+            if (true === isset($cacheData[$key])) {
+                unset($cacheData[$key]);
+                $cacheData = json_encode($cacheData);
+                self::filePutContents($this->getCacheDir(), $cacheData);
+            } else {
+                throw new Exception("Error: erase() - Key '{$key}' not found.");
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * 删除所有的缓存
+     * @return $this
+     */
+    public function delAll() {
+        $cacheDir = $this->getCacheDir();
+        if (true === self:: fileExists($cacheDir)) {
+            self::unlink($cacheDir);
+        }
+
+        return $this;
+    }
+
+    /**
      * 加载缓存
      * @return mixed
      */
     private function loadCacheInfo() {
-        if (true === file_exists($this->getCacheDir())) {
+        if (true === self:: fileExists($this->getCacheDir())) {
             $file = file_get_contents($this->getCacheDir());
 
             return json_decode($file, true);
@@ -53,21 +156,6 @@ class SimpleCache implements IDataCache {
         }
     }
 
-    /**
-     * 构造函数
-     * @param null|array $config
-     */
-    public function __construct($config = null) {
-        if (true === isset($config)) {
-            if (is_string($config)) {
-                $this->_cachename = $config;
-            } else if (is_array($config)) {
-                $this->_cachename = $config['name'];
-                $this->_cachePath = $config['path'];
-                $this->_extension = $config['extension'];
-            }
-        }
-    }
 
     /**
      * 移除过期的缓存
@@ -85,26 +173,11 @@ class SimpleCache implements IDataCache {
             }
             if ($counter > 0) {
                 $cacheData = json_encode($cacheData);
-                file_put_contents($this->getCacheDir(), $cacheData);
+                self::filePutContents($this->getCacheDir(), $cacheData);
             }
 
             return $counter;
         }
-    }
-
-
-    /**
-     * 删除所有的缓存
-     * @return $this
-     */
-    public function delAll() {
-        $cacheDir = $this->getCacheDir();
-        if (true === file_exists($cacheDir)) {
-            $cacheFile = fopen($cacheDir, 'w');
-            fclose($cacheFile);
-        }
-
-        return $this;
     }
 
 
@@ -139,9 +212,9 @@ class SimpleCache implements IDataCache {
      * @throws Exception
      */
     private function checkCacheDir() {
-        if (!is_dir($this->_cachePath) && !mkdir($this->_cachePath, 0775, true)) {
+        if (!self::isDir($this->_cachePath) && !self::mkDir($this->_cachePath, 0775, true)) {
             throw new Exception('无法创建缓存目录' . $this->_cachePath);
-        } elseif (!is_readable($this->_cachePath) || !is_writable($this->_cachePath)) {
+        } elseif (!self::isReadable($this->_cachePath) || !self::isWritable($this->_cachePath)) {
             if (!chmod($this->_cachePath, 0775)) {
                 throw new Exception($this->_cachePath . ' 目录必须可读可写');
             }
@@ -151,76 +224,69 @@ class SimpleCache implements IDataCache {
     }
 
     /**
-     * 添加缓存数据
-     * @param string $key 缓存key
-     * @param object $data 缓存数据
-     * @param int    $duration 缓存时间（秒）
-     * @return bool
+     * 将数据写入文件中
+     * @param string $filename 文件名称
+     * @param mixed  $data 写入的数据
+     * @return int 返回写入的字节数
      */
-    public function  addData($key, $data, $duration) {
-        $storeData = array('time' => time(), 'expire' => $duration, 'data' => serialize($data));
-        $dataArray = $this->loadCacheInfo();
-        if (true === is_array($dataArray)) {
-            $dataArray[$key] = $storeData;
-        } else {
-            $dataArray = array($key => $storeData);
-        }
-        $cacheData = json_encode($dataArray);
-
-        return file_put_contents($this->getCacheDir(), $cacheData) > 0;
+    private function  filePutContents($filename, $data) {
+        return file_put_contents($filename, $data);
     }
 
     /**
-     * 获取缓存数据
-     * @param string $key 缓存key
-     * @return object
+     * 判断文件是否存在
+     * @param string $filename 文件名称
+     * @return bool
      */
-    public function getData($key) {
-        $cachedData = $this->loadCacheInfo();
-        $cacheInfo  = $cachedData[$key];
-        if (!isset($cacheInfo)) {
-            return null;
-        }
-        if (true === $this->checkExpired($cacheInfo['time'], $cacheInfo['expire'])) {
-            //删除过期的缓存数据
-            $this->eraseExpired();
-
-            return null;
-        }
-
-        return unserialize($cachedData[$key]['data']);
+    private function isDir($filename) {
+        return is_dir($filename);
     }
 
     /**
-     * 缓存是否存在
-     * @param string $key 缓存key
+     * 生成文件目录
+     * @param string $pathname 文件名称
+     * @param int    $mode
+     * @param bool   $recursive
      * @return bool
      */
-    public function  hasKey($key) {
-        if (false != $this->loadCacheInfo()) {
-            $cachedData = $this->loadCacheInfo();
-
-            return isset($cachedData[$key]['data']);
-        }
+    function mkDir($pathname, $mode = 0777) {
+        return mkdir($pathname, $mode);
     }
 
     /**
-     * 删除某个缓存key
-     * @param string $key
+     * 文件是否存在
+     * @param string $filename 文件名称
      * @return bool
      */
-    public function  delKey($key) {
-        $cacheData = $this->loadCacheInfo();
-        if (true === is_array($cacheData)) {
-            if (true === isset($cacheData[$key])) {
-                unset($cacheData[$key]);
-                $cacheData = json_encode($cacheData);
-                file_put_contents($this->getCacheDir(), $cacheData);
-            } else {
-                throw new Exception("Error: erase() - Key '{$key}' not found.");
-            }
-        }
-
-        return true;
+    function fileExists($filename) {
+        return file_exists($filename);
     }
+
+    /**
+     * 判读文件存在及可读
+     * @param string $filename 文件名称
+     * @return bool
+     */
+    function isReadable($filename) {
+        return is_readable($filename);
+    }
+
+    /**
+     * 判断文件是否可写
+     * @param string $filename 文件名称
+     * @return bool
+     */
+    function isWritable($filename) {
+        return is_writable($filename);
+    }
+
+    /**
+     * 删除文件
+     * @param $filename 文件名
+     * @return bool
+     */
+    function unLink($filename) {
+        return unlink($filename);
+    }
+
 }
