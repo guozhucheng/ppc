@@ -15,6 +15,7 @@ require_once(__DIR__ . '/aop/loader.php');
 class Demo {
 
     /**
+     * 待验证函数示例
      * @param int    $p1
      * @param uint   $p2
      * @param float  $p3
@@ -30,7 +31,7 @@ class Demo {
 
 $ins = ClassFactory::getInstance(new Demo());
 
-//pass
+//验证通过
 $ins->demoMethod(-10, 2, 3.14, true, 'str', array(), '2014-9-9 12:12:122');
 
 //p2 is illegal
@@ -38,3 +39,8 @@ $ins->demoMethod(-10, -2, 3.14, true, 'str', array(), '2014-9-9 12:12:122');
 
 //p5 is illegal
 $ins->demoMethod(-10, 2, 3.14, true, null, array(), '2014-9-9 12:12:122');
+
+//上述代码将会输出
+//invoke method
+//param p2 is illegal,because 参数类型校验与注释说明不匹配
+//param p5 is illegal,because 参数类型校验与注释说明不匹配
