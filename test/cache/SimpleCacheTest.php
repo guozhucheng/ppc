@@ -5,7 +5,6 @@ namespace test\cache;
 
 use cache\SimpleCache;
 use PHPUnit_Framework_TestCase;
-use ReflectionClass;
 
 require_once(__DIR__ . '/../../cache/loader.php');
 
@@ -34,7 +33,7 @@ class SimpleCacheTest extends PHPUnit_Framework_TestCase {
     public function  testAddData() {
         $mockSimple = $this->getMock('SimpleCache', array('filePutContents', 'loadCacheInfo'));
         $mockSimple->expects($this->any())->method('filePutContents')->will($this->returnValue(1));
-        $mockSimple->expects($this->amy())->method('loadCacheInfo')->will($this->returnValue(array()));
+        $mockSimple->expects($this->any())->method('loadCacheInfo')->will($this->returnValue(array()));
 
         $simpleCache = new SimpleCache();
         $ret         = $simpleCache->addData('key', 'data', 10);

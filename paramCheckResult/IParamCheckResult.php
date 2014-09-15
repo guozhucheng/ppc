@@ -5,6 +5,7 @@
 namespace paramCheckResult;
 /**
  * 参数检查结果结果
+ * 不同的项目可通过实现该接口,实现自定义的结果定义
  * Interface ICheckReuslt
  */
 interface IParamCheckResult {

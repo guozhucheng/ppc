@@ -80,6 +80,7 @@ class SimpleCache implements IDataCache {
 
             return null;
         }
+
         return unserialize($cachedData[$key]['data']);
     }
 

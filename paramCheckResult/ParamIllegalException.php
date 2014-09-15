@@ -22,11 +22,11 @@ class ParamIllegalException extends Exception {
      */
     public function __construct($paramName, $message) {
         $this->_paramName = $paramName;
-        parent:: __construct($message, 0, null);
+        parent:: __construct($message);
     }
 
     /**
-     * 获取名称
+     * 获取参数名称
      * @return mixed
      */
     public function  getName() {

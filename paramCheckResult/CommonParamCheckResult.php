@@ -16,6 +16,6 @@ class CommonParamCheckResult implements IParamCheckResult {
      * @return mixed
      */
     public function setCheckResult($paramName, $reason) {
-        echo '<br>' . 'param ' . $paramName . ' is illegal,because ' . $reason;
+        echo '<br>' . '参数 ' . $paramName . ' 非法,原因:' . $reason;
     }
 }
