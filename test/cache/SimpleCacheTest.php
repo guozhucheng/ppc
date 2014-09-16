@@ -4,7 +4,6 @@
 namespace test\cache;
 
 use cache\SimpleCache;
-use PHPUnit_Framework_TestCase;
 
 require_once(__DIR__ . '/../../cache/loader.php');
 
@@ -15,22 +14,10 @@ require_once(__DIR__ . '/../../cache/loader.php');
  */
 class SimpleCacheTest extends PHPUnit_Framework_TestCase {
 
-//    /**
-//     * 测试loadCache方法
-//     */
-//    public function testLoadCache() {
-//        $simpleCache      = new SimpleCache();
-//        $ref_SimpleCache  = new ReflectionClass(get_class($simpleCache));
-//        $method_loadCache = $ref_SimpleCache->getMethod('loadCache');
-//        $method_loadCache->setAccessible(true);
-//        $resut = $method_loadCache->invoke($simpleCache);
-//        var_export($resut);
-//    }
-
     /**
      * test function addData
      */
-    public function  testAddData() {
+    function  testAddData() {
         $mockSimple = $this->getMock('SimpleCache', array('filePutContents', 'loadCacheInfo'));
         $mockSimple->expects($this->any())->method('filePutContents')->will($this->returnValue(1));
         $mockSimple->expects($this->any())->method('loadCacheInfo')->will($this->returnValue(array()));
@@ -41,7 +28,7 @@ class SimpleCacheTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals($ret, true);
     }
 
-    public function  testGetData() {
+    function  testGetData() {
         $cacheData = array('key' => array('time' => date(''), 'expire' => 36000, 'data' => 'data'));
 
         $mockSimple = $this->getMock('SimpleCache');
@@ -49,10 +36,36 @@ class SimpleCacheTest extends PHPUnit_Framework_TestCase {
 
         $simpleCache = new SimpleCache();
         $ret         = $simpleCache->getData('key');
-        var_export($ret);
-        var_export($cacheData['key']['data']);
+
         $this->assertEquals($ret, $cacheData['key']['data']);
 
     }
+
+    function  testHasKey() {
+        $cacheData  = array('key' => array('time' => date(''), 'expire' => 36000, 'data' => 'data'));
+        $mockSimple = $this->getMock('SimpleCache');
+        $mockSimple->expects($this->any())->method('loadCacheInfo')->will($this->returnValue($cacheData));
+
+        $simple = new SimpleCache();
+        $ret    = $simple->hasKey('key');
+        $this->assertEquals($ret, true);
+        $ret = $simple->hasKey('unexistskey');
+        $this->assertEquals($ret, false);
+
+    }
+
+    function  testDelKey() {
+        $cacheData  = array('key' => array('time' => date(''), 'expire' => 36000, 'data' => 'data'));
+        $mockSimple = $this->getMock('SimpleCache');
+        $mockSimple->expects($this->any())->method('loadCacheInfo')->will($this->returnValue($cacheData));
+        $mockSimple->expects($this->any())->method('filePutContents')->will($this->returnValue(true));
+
+        $simple = new SimpleCache();
+        $ret    = $simple->delKey('key');
+        $this->assertEquals($ret, true);
+        $ret = $simple->delKey('unexistskey');
+        $this->assertEquals($ret, false);
+
+    }
+
 }
- 

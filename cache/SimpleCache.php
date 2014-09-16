@@ -104,13 +104,14 @@ class SimpleCache implements IDataCache {
      */
     public function  delKey($key) {
         $cacheData = $this->loadCacheInfo();
+        var_export($cacheData);
         if (true === is_array($cacheData)) {
             if (true === isset($cacheData[$key])) {
                 unset($cacheData[$key]);
                 $cacheData = json_encode($cacheData);
                 self::filePutContents($this->getCacheDir(), $cacheData);
             } else {
-                throw new Exception("Error: erase() - Key '{$key}' not found.");
+                return false;
             }
         }
 
@@ -135,6 +136,7 @@ class SimpleCache implements IDataCache {
      * @return mixed
      */
     private function loadCacheInfo() {
+        var_export('real loadCacheInfo');
         if (true === self:: fileExists($this->getCacheDir())) {
             $file = file_get_contents($this->getCacheDir());
 
