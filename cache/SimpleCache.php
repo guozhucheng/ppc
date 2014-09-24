@@ -31,7 +31,7 @@ class SimpleCache implements IDataCache {
      * @param null|array $config
      */
     public function __construct($config = null) {
-        if (true === isset($config)) {
+        if (isset($config)) {
             if (is_string($config)) {
                 $this->_cachename = $config;
             } else if (is_array($config)) {
@@ -50,7 +50,11 @@ class SimpleCache implements IDataCache {
      * @return bool
      */
     public function  addData($key, $data, $duration) {
-        $storeData = array('time' => time(), 'expire' => $duration, 'data' => serialize($data));
+        $storeData = array(
+            'time'   => time(),
+            'expire' => $duration,
+            'data'   => serialize($data),
+        );
         $dataArray = $this->loadCacheInfo();
         if (true === is_array($dataArray)) {
             $dataArray[$key] = $storeData;
@@ -104,8 +108,7 @@ class SimpleCache implements IDataCache {
      */
     public function  delKey($key) {
         $cacheData = $this->loadCacheInfo();
-        var_export($cacheData);
-        if (true === is_array($cacheData)) {
+        if (is_array($cacheData)) {
             if (true === isset($cacheData[$key])) {
                 unset($cacheData[$key]);
                 $cacheData = json_encode($cacheData);
@@ -136,7 +139,6 @@ class SimpleCache implements IDataCache {
      * @return mixed
      */
     private function loadCacheInfo() {
-        var_export('real loadCacheInfo');
         if (true === self:: fileExists($this->getCacheDir())) {
             $file = file_get_contents($this->getCacheDir());
 

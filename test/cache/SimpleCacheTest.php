@@ -18,7 +18,10 @@ class SimpleCacheTest extends PHPUnit_Framework_TestCase {
      * test function addData
      */
     function  testAddData() {
-        $mockSimple = $this->getMock('SimpleCache', array('filePutContents', 'loadCacheInfo'));
+        $mockSimple = $this->getMock('SimpleCache', array(
+            'filePutContents',
+            'loadCacheInfo',
+        ));
         $mockSimple->expects($this->any())->method('filePutContents')->will($this->returnValue(1));
         $mockSimple->expects($this->any())->method('loadCacheInfo')->will($this->returnValue(array()));
 
@@ -28,8 +31,17 @@ class SimpleCacheTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals($ret, true);
     }
 
+    /**
+     * 测试 getData
+     */
     function  testGetData() {
-        $cacheData = array('key' => array('time' => date(''), 'expire' => 36000, 'data' => 'data'));
+        $cacheData = array(
+            'key' => array(
+                'time'   => date(''),
+                'expire' => 36000,
+                'data'   => 'data',
+            ),
+        );
 
         $mockSimple = $this->getMock('SimpleCache');
         $mockSimple->expects($this->any())->method('loadCacheInfo')->will($this->returnValue($cacheData));
@@ -41,8 +53,17 @@ class SimpleCacheTest extends PHPUnit_Framework_TestCase {
 
     }
 
+    /**
+     * 单测 hasKey
+     */
     function  testHasKey() {
-        $cacheData  = array('key' => array('time' => date(''), 'expire' => 36000, 'data' => 'data'));
+        $cacheData  = array(
+            'key' => array(
+                'time'   => date(''),
+                'expire' => 36000,
+                'data'   => 'data',
+            ),
+        );
         $mockSimple = $this->getMock('SimpleCache');
         $mockSimple->expects($this->any())->method('loadCacheInfo')->will($this->returnValue($cacheData));
 
@@ -54,8 +75,17 @@ class SimpleCacheTest extends PHPUnit_Framework_TestCase {
 
     }
 
+    /**
+     * 单测delKey
+     */
     function  testDelKey() {
-        $cacheData  = array('key' => array('time' => date(''), 'expire' => 36000, 'data' => 'data'));
+        $cacheData  = array(
+            'key' => array(
+                'time'   => date(''),
+                'expire' => 36000,
+                'data'   => 'data',
+            ),
+        );
         $mockSimple = $this->getMock('SimpleCache');
         $mockSimple->expects($this->any())->method('loadCacheInfo')->will($this->returnValue($cacheData));
         $mockSimple->expects($this->any())->method('filePutContents')->will($this->returnValue(true));

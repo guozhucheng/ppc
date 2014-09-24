@@ -57,7 +57,7 @@ class  ParamFilter {
             foreach ($fucIns->getParameters() as $param) {
                 array_push($paraNames, $param->getName());
             }
-            //生成ParmDocInfo对象数组
+            //生成ParamDocInfo对象数组
             foreach ($paraNames as $paramName) {
                 $paramDocInfo = null;
                 foreach ($paramDocInfos as $paramDoc) {
@@ -66,7 +66,10 @@ class  ParamFilter {
                         break;
                     }
                 }
-                array_push($paramInfos, array('name' => $paramName, 'paramdocinfo' => $paramDocInfo));
+                array_push($paramInfos, array(
+                    'name'         => $paramName,
+                    'paramdocinfo' => $paramDocInfo
+                ));
             }
             //将反射结果存入缓存中
             if ($cache != null) {
@@ -104,7 +107,7 @@ class  ParamFilter {
      */
     private static function getCheckResult() {
         if (self::$_checkResult == null) {
-            self::$_checkResult = ParamCheckResultFactory::createReuslt(self::COMMON_RESULT);
+            self::$_checkResult = ParamCheckResultFactory::createResult(self::COMMON_RESULT);
         }
 
         return self::$_checkResult;

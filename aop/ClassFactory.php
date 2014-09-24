@@ -10,7 +10,7 @@ class ClassFactory {
 
     /**
      * 获取工厂加工后的实例
-     * @param class $instance
+     * @param object(typeof class) $instance
      * @return \aop\AopClass
      */
     public static function getInstance($instance) {

@@ -9,7 +9,7 @@ use ParamFilter;
 
 /**
  * 简单的aop实现
- * 对需要进行切面参数校验的类用此类进行分装
+ * 对需要进行切面参数校验的类用此类进行封装
  * 封装后的类进行方法调用时会触发魔术方法__call的调用,在执行函数体之前,进行参数校验
  * Class AopClass
  */
@@ -32,7 +32,7 @@ class AopClass {
      * @param string $method 方法名称
      * @param array  $arguments 实参数组
      * @return mixed
-     * @throws \Exception 验证不通过是
+     * @throws \Exception 验证不通过时抛出异常
      */
     public function __call($method, $arguments) {
         if (!method_exists($this->_instance, $method)) {
@@ -41,12 +41,15 @@ class AopClass {
         try { //执行参数检查
             ParamFilter::paramsCheck(get_class($this->_instance), $method, $arguments);
         } catch (ParamIllegalException $e) { //捕获到异常，参数校验失败
-            $checkResult = ParamCheckResultFactory::createReuslt(self::COMMON_RESULT_CLASS);
+            $checkResult = ParamCheckResultFactory::createResult(self::COMMON_RESULT_CLASS);
 
             return $checkResult->setCheckResult($e->getName(), $e->getMessage());
         }
 
         //通过参数校验,进行函数调用
-        return call_user_func_array(array($this->_instance, $method), $arguments);
+        return call_user_func_array(array(
+            $this->_instance,
+            $method,
+        ), $arguments);
     }
 }

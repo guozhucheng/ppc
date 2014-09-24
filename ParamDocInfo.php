@@ -132,6 +132,7 @@ class ParamDocInfo {
     public function getName() {
         return $this->_name;
     }
+
     /**
      * 判断是否为整数
      * @param $val
@@ -173,15 +174,16 @@ class ParamDocInfo {
 
     /**
      * 判断是否是date类型
-     * @param $val 待验证值
+     * @param object $val 待验证值
      * @return bool
      */
     private static function isDate($val) {
         $t = strtotime($val);
-        $m = date('m',$t);
-        $d = date('d',$t);
-        $y = date('Y',$t);
-        return checkdate ($m, $d, $y);
+        $m = date('m', $t);
+        $d = date('d', $t);
+        $y = date('Y', $t);
+
+        return checkdate($m, $d, $y);
     }
 
 

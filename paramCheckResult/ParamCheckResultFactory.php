@@ -1,6 +1,8 @@
 <?php
 namespace paramCheckResult;
 
+use SebastianBergmann\Exporter\Exception;
+
 
 /**
  * 参数检查结果抽象工厂类
@@ -16,13 +18,13 @@ abstract class ParamCheckResultFactory {
      * @param $resultName
      * @return IParamCheckResult
      */
-    static function  createReuslt($resultName) {
+    static function  createResult($resultName) {
         //目前仅有一种CommonParamParamCheckResult一种实现
         switch ($resultName) {
             case self::COMMON_RESULT_CLASS:
-            return new CommonParamCheckResult();
-            default:
                 return new CommonParamCheckResult();
+            default:
+                throw new Exception($resultName . '结果类未定义');
         }
     }
 } 

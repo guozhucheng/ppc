@@ -1,5 +1,8 @@
 <?php
 namespace cache;
+
+use SebastianBergmann\Exporter\Exception;
+
 /**
  * 数据缓存抽象工厂类
  * 实现缓存对象获取的工厂,在不同的项目中,可以包含不同的缓存实现
@@ -23,7 +26,7 @@ abstract class DataCacheFactory {
             case self::SIMPLE_CACHE:
                 return new SimpleCache($config);
             default:
-                return new SimpleCache($config);
+                throw new Exception($cacheName . '缓存类未定义');
         }
     }
 }
