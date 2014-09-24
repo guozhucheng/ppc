@@ -139,6 +139,13 @@ class ParamDocInfo {
      * @return bool
      */
     private static function  isInt($val) {
+        /*
+         * 正则匹配是否为整数,整数的传入形式
+         * 1234 十进制数
+         * -123 负数
+         * 0123 八进制数 (等于十进制 83)
+         * 0x1A(等于十进制 26)
+         */
         if (preg_match("/^-?\+?[1-9]{1,21}\\d*$|^0$/", $val)) {
             return true;
         }
