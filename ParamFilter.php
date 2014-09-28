@@ -20,7 +20,7 @@ class  ParamFilter {
     //默认缓存名称
     const   DEFAULT_CACHE = 'SimpleCache';
     //默认参数结果实现类
-    const  COMMON_RESULT   = 'CommonParamParamCheckResult';
+    const  COMMON_RESULT = 'CommonParamParamCheckResult';
     const   CACHE_DURATION = 300; //默认缓存5分钟
     //缓存对象
     private static $_cache;
@@ -68,7 +68,7 @@ class  ParamFilter {
                 }
                 array_push($paramInfos, array(
                     'name'         => $paramName,
-                    'paramdocinfo' => $paramDocInfo
+                    'paramdocinfo' => $paramDocInfo,
                 ));
             }
             //将反射结果存入缓存中
