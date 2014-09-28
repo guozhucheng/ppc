@@ -146,7 +146,7 @@ class ParamDocInfo {
          * 0123 八进制数 (等于十进制 83)
          * 0x1A(等于十进制 26)
          */
-        if (preg_match("/^-?\+?[1-9]{1,21}\\d*$|^0$/", $val)) {
+        if (preg_match("/^-?\+?[1-9]\\d{0,19}$|^0$|^-?\+?0[1-7][0-7]{0,21}$|^-?\+?0[xX][1-9a-fA-F][0-9a-fA-F]{0,21}$/", $val)) {
             return true;
         }
 
@@ -159,7 +159,7 @@ class ParamDocInfo {
      * @return bool
      */
     private static function  isuInt($val) {
-        if (preg_match("/^\+?[1-9]{1,21}\\d*$|^0$/", $val)) {
+        if (preg_match("/^\+?[1-9]\\d{0,19}$|^0$|^\+?0[1-7][0-7]{0,21}$|^\+?0[xX][1-9a-fA-F][0-9a-fA-F]{0,21}$/", $val)) {
             return true;
         }
 
@@ -172,7 +172,7 @@ class ParamDocInfo {
      * @return bool
      */
     private static function isFloat($val) {
-        if (is_numeric($val) && is_float(floatval($val))) {
+        if (preg_match("/^[+-]?(\d*\.\d+([eE]?[+-]?\d+)?|\d+[eE][+-]?\d+)$/", $val)) {
             return true;
         }
 
@@ -185,12 +185,7 @@ class ParamDocInfo {
      * @return bool
      */
     private static function isDate($val) {
-        $t = strtotime($val);
-        $m = date('m', $t);
-        $d = date('d', $t);
-        $y = date('Y', $t);
-
-        return checkdate($m, $d, $y);
+        return strtotime((string)$val) !== false;
     }
 
 

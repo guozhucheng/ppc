@@ -6,6 +6,7 @@ use Exception;
 use paramCheckResult\ParamCheckResultFactory;
 use paramCheckResult\ParamIllegalException;
 use ParamFilter;
+use \UndefinedMethodException;
 
 /**
  * 简单的aop实现
@@ -36,7 +37,7 @@ class AopClass {
      */
     public function __call($method, $arguments) {
         if (!method_exists($this->_instance, $method)) {
-            throw new Exception($method . '方法未定义');
+            throw new UndefinedMethodException($method);
         }
         try { //执行参数检查
             ParamFilter::paramsCheck(get_class($this->_instance), $method, $arguments);
@@ -48,8 +49,7 @@ class AopClass {
 
         //通过参数校验,进行函数调用
         return call_user_func_array(array(
-            $this->_instance,
-            $method,
+            $this->_instance, $method,
         ), $arguments);
     }
 }

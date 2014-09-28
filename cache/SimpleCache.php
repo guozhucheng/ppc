@@ -47,13 +47,11 @@ class SimpleCache implements IDataCache {
      * @param string $key 缓存key
      * @param object $data 缓存数据
      * @param int    $duration 缓存时间（秒）
-     * @return bool
+     * @return bool true 添加成功，false 添加失败
      */
     public function  addData($key, $data, $duration) {
         $storeData = array(
-            'time'   => time(),
-            'expire' => $duration,
-            'data'   => serialize($data),
+            'time' => time(), 'expire' => $duration, 'data' => serialize($data),
         );
         $dataArray = $this->loadCacheInfo();
         if (true === is_array($dataArray)) {
@@ -135,10 +133,20 @@ class SimpleCache implements IDataCache {
     }
 
     /**
-     * 加载缓存
+     * 加载缓存,并处理过期数据
      * @return mixed
      */
     private function loadCacheInfo() {
+        self::eraseExpired();
+
+        return self::loadCacheFile();
+    }
+
+    /**
+     * 加载缓存
+     * @return bool|mixed
+     */
+    private function  loadCacheFile() {
         if (true === self:: fileExists($this->getCacheDir())) {
             $file = file_get_contents($this->getCacheDir());
 
@@ -167,7 +175,7 @@ class SimpleCache implements IDataCache {
      * @return int
      */
     private function eraseExpired() {
-        $cacheData = $this->loadCacheInfo();
+        $cacheData = $this->loadCacheFile();
         if (true === is_array($cacheData)) {
             $counter = 0;
             foreach ($cacheData as $key => $entry) {
