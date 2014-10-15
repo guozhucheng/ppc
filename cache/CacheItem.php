@@ -1,4 +1,5 @@
 <?php
+namespace cache;
 
 /**
  * 缓存项,类在创建时尝试按照实例信息对应的文件目录加载一次缓存信息至内存中;
@@ -63,7 +64,11 @@ class CacheItem {
                 $this->_extension = isset($config['extension']) ? $config['extension'] : $this->_extension;
             }
             //对象构造时,从文件中一次性读入缓存,
-            $this->cachInfo = $this->loadCacheInfo();
+            $cacheInfo = $this->loadCacheInfo();
+            if ($cacheInfo !== false) {
+                $this->cachInfo = $cacheInfo;
+
+            }
         }
     }
 
@@ -71,7 +76,7 @@ class CacheItem {
      * 当缓存对象销毁时,将缓存由内存写入文件
      */
     public function __destruct() {
-        file_put_contents($this->getCacheDir(), $this->cachInfo);
+        file_put_contents($this->getCacheDir(), json_encode($this->cachInfo));
     }
 
 
@@ -84,7 +89,7 @@ class CacheItem {
             return false;
         }
 
-        return $this->cachInfo[$key];
+        return $this->cachInfo[$key]['data'];
     }
 
     /**
@@ -101,8 +106,7 @@ class CacheItem {
             $this->duringIncreCacheCount = 0;
         }
         $this->cachInfo[$key] = array(
-            'data'       => $data,
-            'expiretime' => time() + $duration,
+            'data' => $data, 'expiretime' => time() + $duration,
         );
         $this->duringIncreCacheCount++;
 
@@ -161,8 +165,7 @@ class CacheItem {
     private function removeExpireData() {
         //先按照过期时间进行倒排
         usort($this->cachInfo, array(
-            __CLASS__,
-            'sortCacheInfo'
+            __CLASS__, 'sortCacheInfo'
         ));
 
         while (count($this->cachInfo) > 0) {
@@ -207,7 +210,8 @@ class CacheItem {
     private function checkCacheDir() {
         if (!is_dir($this->_cachePath) && !mkdir($this->_cachePath, 0775, true)) {
             throw new Exception('无法创建缓存目录' . $this->_cachePath);
-        } elseif (!is_readable($this->_cachePath) || !is_readable($this->_cachePath)) {
+        }
+        if (!is_readable($this->_cachePath) || !is_readable($this->_cachePath)) {
             if (!chmod($this->_cachePath, 0775)) {
                 throw new Exception($this->_cachePath . ' 目录必须可读可写');
             }

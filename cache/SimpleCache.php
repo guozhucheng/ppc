@@ -15,7 +15,7 @@ class SimpleCache implements IDataCache {
         //查看缓存列表里是否存在$cacheName的实例,不存在则新创建一个
         if (!array_key_exists($cacheName, self::$cacheItems)) {
             $this->currentCacheItem = new CacheItem($cacheName);
-            $cacheName[$cacheName]  = $this->currentCacheItem;
+            $cacheItems[$cacheName] = $this->currentCacheItem;
         }
     }
 
