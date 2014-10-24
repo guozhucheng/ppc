@@ -16,7 +16,7 @@ class CommonParamCheckResult implements IParamCheckResult {
      * @return mixed
      */
     public function checkFailed($paramName, $reason) {
-        echo '<br>' . '参数 ' . $paramName . ' 非法,原因:' . $reason;
+//        echo '<br>' . '参数 ' . $paramName . ' 非法,原因:' . $reason;
         printf("参数%s校验失败,原因%s\n", $paramName, $reason);
     }
 }

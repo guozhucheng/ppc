@@ -25,7 +25,7 @@ class Demo {
      * @param date  $p7
      */
     public function  demoMethod($p1, $p2, $p3, $p4, $p5, $p6, $p7, $p8) {
-        echo '<br> invoke method';
+       printf("invoke method\s");
     }
 }
 
@@ -41,6 +41,6 @@ $ins->demoMethod(-10, -2, 3.14, true, 'str', array(), '2014-9-9 12:12:122');
 $ins->demoMethod(-10, 2, 3.14, true, null, array(), '2014-9-9 12:12:122');
 
 //上述代码将会输出
-//invoke method
-//param p2 is illegal,because 参数类型校验与注释说明不匹配
-//param p5 is illegal,because 参数类型校验与注释说明不匹配
+//参数p7校验失败,原因Expect Type:date
+//参数p7校验失败,原因Expect Type:date
+//参数p5校验失败,原因Expect Type:string
