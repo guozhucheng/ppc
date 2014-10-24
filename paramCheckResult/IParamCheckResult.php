@@ -11,10 +11,10 @@ namespace paramCheckResult;
 interface IParamCheckResult {
 
     /**
-     * 设置参数检查结果
+     * 参数囧啊眼失败
      * @param   string $paramName 参数名称
      * @param   object $reason 原因
      * @return mixed
      */
-    public function setCheckResult($paramName, $reason);
+    public function checkFailed($paramName, $reason);
 }

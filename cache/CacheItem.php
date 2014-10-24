@@ -53,6 +53,7 @@ class CacheItem {
 
     /**
      *构造缓存对象
+     * @param null|array $config
      */
     public function  __construct($config = null) {
         if (isset($config)) {
@@ -82,7 +83,8 @@ class CacheItem {
 
     /**
      * 获取数据项
-     * @param $key
+     * @param stirng $key
+     * @return bool|array
      */
     public function getCachInfo($key) {
         if (!array_key_exists($key, $this->cachInfo)) {
@@ -106,7 +108,8 @@ class CacheItem {
             $this->duringIncreCacheCount = 0;
         }
         $this->cachInfo[$key] = array(
-            'data' => $data, 'expiretime' => time() + $duration,
+            'data'       => $data,
+            'expiretime' => time() + $duration,
         );
         $this->duringIncreCacheCount++;
 
@@ -165,16 +168,17 @@ class CacheItem {
     private function removeExpireData() {
         //先按照过期时间进行倒排
         usort($this->cachInfo, array(
-            __CLASS__, 'sortCacheInfo'
+            __CLASS__,
+            'sortCacheInfo',
         ));
-
-        while (count($this->cachInfo) > 0) {
+        while ($cacheCount > 0) {
             $item = array_pop($this->cachInfo);
             //缓存未过期并且缓存数量未超过总量规定
             if (!$this->checkExpired($item['expiretime']) && count($this->cachInfo < self::MAX_CACHE_COUNT)) {
                 array_push($this->cachInfo, $item); //重新将数据推入数组
                 break;
             }
+            $cacheCount = count($this->cachInfo);
         }
     }
 

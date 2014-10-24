@@ -24,21 +24,21 @@ class ParamDocInfo {
     private $_isNull = null;
 
     // 数据类型 types
-    const TYPE_INT     = 'int';
+    const TYPE_INT = 'int';
     const TYPE_INTEGER = 'intger';
-    const TYPE_UINT    = 'uint'; //无符号整数（大于等于0）
-    const TYPE_FLOAT   = 'float';
-    const TYPE_DOUBLE  = 'double';
-    const TYPE_BOOL    = 'bool';
+    const TYPE_UINT = 'uint'; //无符号整数（大于等于0）
+    const TYPE_FLOAT = 'float';
+    const TYPE_DOUBLE = 'double';
+    const TYPE_BOOL = 'bool';
     const TYPE_BOOLEAN = 'boolean';
-    const TYPE_STRING  = 'string';
-    const TYPE_OBJECT  = 'object';
-    const TYPE_DATE    = 'date';
-    const TYPE_ARRAY   = 'array';
+    const TYPE_STRING = 'string';
+    const TYPE_OBJECT = 'object';
+    const TYPE_DATE = 'date';
+    const TYPE_ARRAY = 'array';
 
     //是否可以为null
     const  NULLABLE = 'null';
-    const  NOTNULL  = 'notnull';
+    const  NOTNULL = 'notnull';
 
     /**
      * 构造函数
@@ -134,6 +134,14 @@ class ParamDocInfo {
     }
 
     /**
+     * 获取参数类型
+     * @return null|string
+     */
+    public function get_Type() {
+        return $this->_type;
+    }
+
+    /**
      * 判断是否为整数
      * @param $val
      * @return bool
@@ -145,8 +153,9 @@ class ParamDocInfo {
          * -123 负数
          * 0123 八进制数 (等于十进制 83)
          * 0x1A(等于十进制 26)
+         * 0b101(等于十进制5)
          */
-        if (preg_match("/^-?\+?[1-9]\\d{0,19}$|^0$|^-?\+?0[1-7][0-7]{0,21}$|^-?\+?0[xX][1-9a-fA-F][0-9a-fA-F]{0,21}$/", $val)) {
+        if (preg_match("/^-?\+?[1-9]\\d{0,19}$|^0$|^-?\+?0[1-7][0-7]{0,21}$|^-?\+?0[xX][1-9a-fA-F][0-9a-fA-F]{0,21}$|^-?\+?0b[0-1]{1,64}$/", $val)) {
             return true;
         }
 
@@ -159,7 +168,7 @@ class ParamDocInfo {
      * @return bool
      */
     private static function  isuInt($val) {
-        if (preg_match("/^\+?[1-9]\\d{0,19}$|^0$|^\+?0[1-7][0-7]{0,21}$|^\+?0[xX][1-9a-fA-F][0-9a-fA-F]{0,21}$/", $val)) {
+        if (self::isInt($val) && !preg_match("/^-*$/", $val)) {
             return true;
         }
 
@@ -182,10 +191,11 @@ class ParamDocInfo {
     /**
      * 判断是否是date类型
      * @param object $val 待验证值
+     * 任何能通过strtotime函数转换为time格式的均能通过验证,参照http://jp1.php.net/manual/zh/datetime.formats.php说明
      * @return bool
      */
     private static function isDate($val) {
-        return strtotime((string)$val) !== false;
+        return strtotime((string) $val) !== false;
     }
 
 

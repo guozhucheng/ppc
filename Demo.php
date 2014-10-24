@@ -20,9 +20,9 @@ class Demo {
      * @param uint   $p2
      * @param float  $p3
      * @param bool   $p4
-     * @param        string notnull $p5
-     * @param  array $p6
-     * @param  date  $p7
+     * @param string notnull $p5
+     * @param array $p6
+     * @param date  $p7
      */
     public function  demoMethod($p1, $p2, $p3, $p4, $p5, $p6, $p7, $p8) {
         echo '<br> invoke method';

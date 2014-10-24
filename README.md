@@ -28,4 +28,4 @@ php parameters check php参数校验
     方案：参数检验过程需要通过反射来解析函数注释，为减少频繁的反射引起的性能开销，将反射的结果进行缓存，缓存的实现可通过实现IDataCache接口来扩展不同的缓存实现
 
 4.启动Demo.php进行演示
-PS:php_parameters_check项目以加入个人的github开源项目中，可访问https://github.com/guozhucheng/php_parameters_check来follow项目的更新
+PS:php_parameters_check项目以加入个人的github开源项目中，可访问https://github.com/guozhucheng/ppc 来follow项目的更新

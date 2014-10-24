@@ -24,7 +24,7 @@ class CommonParamParamCheckResultTest extends PHPUnit_Framework_TestCase {
 
         try {
             $object = new CommonParamCheckResult();
-            $object->setCheckResult('paramName', 'reason');
+            $object->checkFailed('paramName', 'reason');
 
         } catch (ParamIllegalException $exception) {
             //SetCheckResult 函数会抛出异常，断言异常

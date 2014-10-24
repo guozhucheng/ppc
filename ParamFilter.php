@@ -16,15 +16,18 @@ require_once(__DIR__ . '/paramCheckResult/loader.php');
  */
 class  ParamFilter {
     //缓存key基础前缀
-    const   CACHE_BASE_NAME = 'PARAMFILLTER_CACHE';
+    const CACHE_BASE_NAME = 'PARAMFILLTER_CACHE';
     //默认缓存名称
-    const   DEFAULT_CACHE = 'SimpleCache';
+    const DEFAULT_CACHE = 'SimpleCache';
     //默认参数结果实现类
-    const  COMMON_RESULT = 'CommonParamParamCheckResult';
-    const   CACHE_DURATION = 300; //默认缓存5分钟
+    const COMMON_RESULT = 'CommonParamParamCheckResult';
+    //默认缓存5分钟
+    const CACHE_DURATION = 300;
+    // 反射的缓存key定义
+    const REFLECT_CACHE_KEY = "REFLECTION_CACHE_";
+
     //缓存对象
     private static $_cache;
-
     //检查结果对象
     private static $_checkResult;
 
@@ -35,13 +38,13 @@ class  ParamFilter {
      * @param array  $arguments 实参数组
      * @throws ParamIllegalException 如果参数不合法则抛出异常
      */
-    public static function  paramsCheck($className, $method, $arguments) {
+    public static function paramsCheck($className, $method, $arguments) {
 
         $paramInfos = array();
 
         //查询缓存中是否有反射结果
         $cache    = self::getCache();
-        $cacheKey = 'REFLECTIONCACHE_' . $className . '_' . $method;
+        $cacheKey = self::REFLECT_CACHE_KEY . $className . '_' . $method;
 
         //缓存中没有数据，则进行反射，并将反射的结果加入缓存中
         if ($cache == null || !$cache->hasKey($cacheKey)) {
@@ -51,7 +54,7 @@ class  ParamFilter {
             $doc         = $fucIns->getDocComment();
             $paramDocs   = self::getDocs($doc);
 
-            $paramDocInfos = self:: docsToParamDocInfos($paramDocs);
+            $paramDocInfos = self::docsToParamDocInfos($paramDocs);
             //获取函数名称
             $paraNames = array();
             foreach ($fucIns->getParameters() as $param) {
@@ -78,22 +81,22 @@ class  ParamFilter {
         } else { //缓存中没有反射结果，则进行反射
             $paramInfos = $cache->getData($cacheKey);
         }
-
-        //实参的个数
-        $count = count($arguments);
-        for ($i = 0; $i < $count; $i++) {
-            $paramDocInfo = $paramInfos[$i]['paramdocinfo'];
-            if (!$paramDocInfo->isLegal($arguments[$i])) {
-                throw new ParamIllegalException($paramInfos[$i]['name'], '参数类型校验与注释说明不匹配');
+        //遍历实参
+        foreach ($arguments as $key => $paramVal) {
+            $paramDocInfo = $paramInfos[$key]['paramdocinfo'];
+            if (isset($paramDocInfo) && !$paramDocInfo->isLegal($paramVal)) {
+                throw new ParamIllegalException($paramInfos[$i]['name'], 'Expect Type:' . $paramDocInfo->getType());
             }
         }
+
+
     }
 
     /**
      * 获取缓存对象
      * @return IDataCache
      */
-    private static function  getCache() {
+    private static function getCache() {
         if (self::$_cache == null) {
             self::$_cache = DataCacheFactory::createCache(self::DEFAULT_CACHE, self::CACHE_BASE_NAME);
         }
@@ -133,7 +136,7 @@ class  ParamFilter {
      * @param string $documents 函数注释内容
      * @return array
      */
-    private function  getDocs($documents) {
+    private function getDocs($documents) {
         $outParams   = null;
         $paramStrArr = array();
         //解析出函数注释中参数描述的部分

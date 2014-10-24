@@ -36,6 +36,7 @@ class AopClass {
      * @throws \Exception 验证不通过时抛出异常
      */
     public function __call($method, $arguments) {
+        //判断实例的method是否存在,实例中必须是定义的method,不能是通过魔术方法实现的;
         if (!method_exists($this->_instance, $method)) {
             throw new UndefinedMethodException($method);
         }
@@ -44,12 +45,13 @@ class AopClass {
         } catch (ParamIllegalException $e) { //捕获到异常，参数校验失败
             $checkResult = ParamCheckResultFactory::createResult(self::COMMON_RESULT_CLASS);
 
-            return $checkResult->setCheckResult($e->getName(), $e->getMessage());
+            return $checkResult->checkFailed($e->getName(), $e->getMessage());
         }
 
         //通过参数校验,进行函数调用
         return call_user_func_array(array(
-            $this->_instance, $method,
+            $this->_instance,
+            $method,
         ), $arguments);
     }
 }
