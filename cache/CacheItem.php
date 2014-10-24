@@ -48,7 +48,7 @@ class CacheItem {
      * 数据缓存对象
      * @var
      */
-    private $cachInfo=array();
+    private $cachInfo = array();
 
 
     /**
@@ -56,19 +56,19 @@ class CacheItem {
      * @param null|array $config
      */
     public function  __construct($config = null) {
-            if (is_string($config)) {
-                $this->_cachename = $config;
-            } else if (is_array($config)) {
-                $this->_cachename = isset($config['name']) ? $config['name'] : $this->_cachename;
-                $this->_cachePath = isset($config['path']) ? $config['path'] : $this->_cachePath;
-                $this->_extension = isset($config['extension']) ? $config['extension'] : $this->_extension;
-            }
-            //对象构造时,从文件中一次性读入缓存,
-            $cacheInfo = $this->loadCacheInfo();
-            if ($cacheInfo !== false) {
-                $this->cachInfo = $cacheInfo;
+        if (is_string($config)) {
+            $this->_cachename = $config;
+        } else if (is_array($config)) {
+            $this->_cachename = isset($config['name']) ? $config['name'] : $this->_cachename;
+            $this->_cachePath = isset($config['path']) ? $config['path'] : $this->_cachePath;
+            $this->_extension = isset($config['extension']) ? $config['extension'] : $this->_extension;
+        }
+        //对象构造时,从文件中一次性读入缓存,
+        $cacheInfo = $this->loadCacheInfo();
+        if ($cacheInfo !== false) {
+            $this->cachInfo = $cacheInfo;
 
-            }
+        }
     }
 
     /**
@@ -106,7 +106,8 @@ class CacheItem {
             $this->duringIncreCacheCount = 0;
         }
         $this->cachInfo[$key] = array(
-            'data' => $data, 'expiretime' => time() + $duration,
+            'data'       => $data,
+            'expiretime' => time() + $duration,
         );
         $this->duringIncreCacheCount++;
 
@@ -165,7 +166,8 @@ class CacheItem {
     private function removeExpireData() {
         //先按照过期时间进行倒排
         usort($this->cachInfo, array(
-            __CLASS__, 'sortCacheInfo',
+            __CLASS__,
+            'sortCacheInfo',
         ));
         $cacheCount = count($this->cachInfo);
         while ($cacheCount > 0) {

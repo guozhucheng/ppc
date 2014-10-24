@@ -137,7 +137,7 @@ class ParamDocInfo {
      * 获取参数类型
      * @return null|string
      */
-    public function get_Type() {
+    public function getType() {
         return $this->_type;
     }
 

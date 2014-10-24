@@ -85,7 +85,7 @@ class  ParamFilter {
         foreach ($arguments as $key => $paramVal) {
             $paramDocInfo = $paramInfos[$key]['paramdocinfo'];
             if (isset($paramDocInfo) && !$paramDocInfo->isLegal($paramVal)) {
-                throw new ParamIllegalException($paramInfos[$key]['name'], 'Expect Type:' . $paramDocInfo->get_Type());
+                throw new ParamIllegalException($paramInfos[$key]['name'], 'Expect Type:' . $paramDocInfo->getType());
             }
         }
 
