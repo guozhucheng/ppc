@@ -148,7 +148,7 @@ class ParamDocInfo {
      */
     private static function  isInt($val) {
         /*
-         * 正则匹配是否为整数,整数的传入形式
+         * 正则匹配是否为整数,整数的传入形 式
          * 1234 十进制数
          * -123 负数
          * 0123 八进制数 (等于十进制 83)

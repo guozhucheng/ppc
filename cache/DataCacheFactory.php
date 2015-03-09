@@ -14,6 +14,10 @@ abstract class DataCacheFactory {
      */
     const  SIMPLE_CACHE = 'SimpleCache';
 
+
+
+    
+
     /**
      * 获取缓存对象实例
      * @param string     $cacheName 缓存实例的名称
